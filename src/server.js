@@ -1,5 +1,6 @@
 import express from 'express';
 import path from 'path';
+import axios from 'axios';
 const app = express();
 import checkLogin from './middleware/authCheck.js';
 import { fileURLToPath } from 'url';
@@ -49,12 +50,21 @@ app.get('/cadastro',(req, res) => {
 })
 
 app.post('/cadastrar-usuario', async (req,res)=>{
-    const {nome,senha,email} = req.body;
+    const {name,password,email} = req.body;
 
-    const usuarioCriado = await createUser(email, nome, senha);
+    try {
+        const response = await axios.post('http://localhost:8080/api/users', {
+            name,
+            email,
+            password
+        });
 
-    if(usuarioCriado != null){
-        return res.redirect("/login");
+        if (response.status === 201 || response.status === 200) {
+            return res.redirect("/login");
+        }
+    } catch (error) {
+        console.error('Erro ao cadastrar usuário:', error.message);
+        return res.render('cadastro', { error: 'Erro ao cadastrar usuário. Tente novamente.' });
     }
 })
 

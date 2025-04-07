@@ -34,9 +34,16 @@ app.get('/login', (req, res) => {
 app.post('/login', async (req,res)=>{
     const {senha,email} = req.body;
 
-    const usuario = await usuarioExist(email,senha);
+    // const usuario = await usuarioExist(email,senha);
 
-    if(usuario == null){
+    const {data} = await axios.get(`http://localhost:8080/api/users/get-user-by-email/${email}`);
+    console.log(data)
+
+    if(data == null){
+        return res.render("login",{error:"Usuário ou senha incorretos"});
+    }
+
+    if(data.password != senha){
         return res.render("login",{error:"Usuário ou senha incorretos"});
     }
 

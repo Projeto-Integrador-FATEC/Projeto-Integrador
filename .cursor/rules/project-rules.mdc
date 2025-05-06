@@ -1,0 +1,11 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+
+# Regras do Projeto com Cursor
+
+## Interface
+
+-A interface do projeto deve ser feita utilizando os componentes do shadcn ui

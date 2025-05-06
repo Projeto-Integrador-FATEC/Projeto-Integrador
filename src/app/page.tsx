@@ -1,103 +1,93 @@
+"use client";
+
 import Image from "next/image";
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { motion } from "motion/react";
+import { motion as framerMotion } from "framer-motion";
 
 export default function Home() {
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+      <div className="mb-4">
+        {/* Header */}
+        <header className="w-full bg-violet-500 shadow-md py-4 px-8 flex items-center justify-center gap-4">
+          <div className="flex max-w-6xl w-full items-center gap-4">
+            <Image src="/logo_img.svg" alt="Study Lovers" width={60} height={60} className="object-contain mb-2" />
+            <h1 className="text-white text-2xl font-bold">Study Lovers</h1>
+          </div>
+        </header>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+        {/* Cards principais */}
+        <section className="flex flex-col md:flex-row gap-4 max-w-6xl w-full mx-auto justify-center mt-10 px-4">
+          <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.1 }} className="flex-1 max-w-sm">
+            <Card className="h-full">
+              <CardHeader>
+                <CardTitle>Procure pelos melhores cursos</CardTitle>
+                <CardDescription>
+                  O StudyLovers conta com diversas empresas, ONGs e organizações para lhe oferecer educação de qualidade
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="h-full flex items-end">
+                <a href="#" className="text-violet-600 hover:underline">Procurar Curso</a>
+              </CardContent>
+            </Card>
+          </motion.div>
+          <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.25 }} className="flex-1 max-w-sm">
+            <Card className="h-full">
+              <CardHeader>
+                <CardTitle>Faça parte dos doadores e incentive a educação equitativa!</CardTitle>
+                <CardDescription>
+                  No StudyLovers você pode se tornar um doador e ajudar sua instituição de ensino a fornecer mais cursos gratuitos
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="h-full flex items-end">
+                <a href="#" className="text-violet-600 hover:underline">Fazer Doação</a>
+              </CardContent>
+            </Card>
+          </motion.div>
+          <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.4 }} className="flex-1 max-w-sm">
+            <Card className="h-full">
+              <CardHeader>
+                <CardTitle>Cadastre seus próprios cursos</CardTitle>
+                <CardDescription>
+                  Se você é uma ONG ou empresa e deseja fornecer cursos gratuitos, podemos ajudá-los !!
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="h-full flex items-end">
+                <a href="#" className="text-violet-600 hover:underline">Cadastrar Curso</a>
+              </CardContent>
+            </Card>
+          </motion.div>
+        </section>
+
+        {/* Colaboradores */}
+        <section className="mt-16 px-4 max-w-6xl w-full mx-auto">
+          <h2 className="text-2xl font-bold mb-8">Conheça Alguns de Nossos Colaboradores</h2>
+          <div className="flex flex-col gap-8">
+            <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.15 }}>
+              <Card className="flex-row flex items-center gap-8 p-8">
+                <Image src="/bradesco_img.svg" alt="Fundação Bradesco" width={100} height={100} className="object-contain" />
+                <div>
+                  <div className="font-semibold mb-2">Fundação Bradesco</div>
+                  <div className="text-muted-foreground text-sm">
+                    Fundação Bradesco é uma instituição sem fins lucrativos criada em 1956 pelo Bradesco, um dos maiores bancos do Brasil. Sua missão é oferecer educação gratuita de qualidade e promover inclusão social para crianças, jovens e adultos em situação de vulnerabilidade social.
+                  </div>
+                </div>
+              </Card>
+            </motion.div>
+            <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.3 }}>
+              <Card className="flex-row flex items-center gap-8 p-8">
+                <Image src="/fgv_img.svg" alt="FGV Cursos Gratuitos" width={100} height={100} className="object-contain" />
+                <div>
+                  <div className="font-semibold mb-2">FGV Cursos Gratuitos</div>
+                  <div className="text-muted-foreground text-sm">
+                    A FGV possui uma variedade de cursos gratuitos em diversas áreas de atuação por conta da parceria com OEG – Open Education Global. Membro desde 2008, a Fundação foi a primeira instituição de ensino brasileira a integrar o consórcio de países que oferecem conteúdos e materiais didáticos gratuitos online.
+                  </div>
+                </div>
+              </Card>
+            </motion.div>
+          </div>
+        </section>
+      </div>
   );
 }

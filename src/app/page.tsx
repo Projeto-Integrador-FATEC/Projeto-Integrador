@@ -3,18 +3,14 @@
 import Image from "next/image";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { motion } from "motion/react";
+import { Header } from "@/components/header";
 
 
 export default function Home() {
   return (
       <div className="mb-4">
         {/* Header */}
-        <header className="w-full bg-violet-500 shadow-md py-4 px-8 flex items-center justify-center gap-4">
-          <div className="flex max-w-6xl w-full items-center gap-4">
-            <Image src="/logo_img.svg" alt="Study Lovers" width={60} height={60} className="object-contain mb-2" />
-            <h1 className="text-white text-2xl font-bold">Study Lovers</h1>
-          </div>
-        </header>
+        <Header />
 
         {/* Cards principais */}
         <section className="flex flex-col md:flex-row gap-4 max-w-6xl w-full mx-auto justify-center mt-10 px-4">

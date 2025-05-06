@@ -1,18 +1,13 @@
 import Image from "next/image";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Header } from "@/components/header";
 
 export default function CursosPage() {
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      {/* Header */}
-      <header className="w-full bg-violet-500 shadow-md py-4 px-8 flex items-center justify-center gap-4">
-        <div className="flex max-w-6xl w-full items-center gap-4">
-          <Image src="/logo_img.svg" alt="Study Lovers" width={60} height={60} className="object-contain mb-2" />
-          <h1 className="text-white text-2xl font-bold">Study Lovers</h1>
-        </div>
-      </header>
-
+      <Header />
+      
       <main className="flex flex-col items-start max-w-6xl w-full mx-auto mt-12 px-4">
         <h2 className="text-3xl font-bold mb-10">Vamos começar a aprender,Daniel</h2>
         <Card className="w-[350px] pb-6 pt-0">

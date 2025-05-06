@@ -2,9 +2,8 @@
 
 import Image from "next/image";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { motion } from "motion/react";
-import { motion as framerMotion } from "framer-motion";
+
 
 export default function Home() {
   return (

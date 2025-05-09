@@ -4,6 +4,7 @@ import Image from "next/image";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { motion } from "motion/react";
 import { Header } from "@/components/header";
+import Link from "next/link";
 
 
 export default function Home() {
@@ -23,7 +24,7 @@ export default function Home() {
                 </CardDescription>
               </CardHeader>
               <CardContent className="h-full flex items-end">
-                <a href="#" className="text-violet-600 hover:underline">Procurar Curso</a>
+                <Link href="/cursos" className="text-violet-600 hover:underline">Procurar Curso</Link>
               </CardContent>
             </Card>
           </motion.div>
@@ -36,7 +37,7 @@ export default function Home() {
                 </CardDescription>
               </CardHeader>
               <CardContent className="h-full flex items-end">
-                <a href="#" className="text-violet-600 hover:underline">Fazer Doação</a>
+                <Link href="/doacoes" className="text-violet-600 hover:underline">Fazer Doação</Link>
               </CardContent>
             </Card>
           </motion.div>
@@ -49,7 +50,7 @@ export default function Home() {
                 </CardDescription>
               </CardHeader>
               <CardContent className="h-full flex items-end">
-                <a href="#" className="text-violet-600 hover:underline">Cadastrar Curso</a>
+                <Link href="/cadastro" className="text-violet-600 hover:underline">Cadastrar Curso</Link>
               </CardContent>
             </Card>
           </motion.div>

@@ -47,7 +47,7 @@ export default function Home() {
               </CardDescription>
             </CardHeader>
             <CardContent className="h-full flex items-end">
-              <Link href="/cadastro" className="text-violet-600 hover:underline">Cadastrar Curso</Link>
+              <Link href="/cadastrar-curso" className="text-violet-600 hover:underline">Cadastrar Curso</Link>
             </CardContent>
           </Card>
         </motion.div>

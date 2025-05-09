@@ -33,7 +33,7 @@ export default function Home() {
               </CardDescription>
             </CardHeader>
             <CardContent className="h-full flex items-end">
-              <Link href="/doacoes" className="text-violet-600 hover:underline">Fazer Doação</Link>
+              <Link href="/cursos" className="text-violet-600 hover:underline">Fazer Doação</Link>
             </CardContent>
           </Card>
         </motion.div>

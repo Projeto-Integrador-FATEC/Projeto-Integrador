@@ -10,7 +10,7 @@ export default function WithHeaderLayout({
       <div className="fixed top-0 left-0 right-0 z-50">
         <Header />
       </div>
-      <main className="flex-1 mt-[128px]">
+      <main className="flex-1 mt-[105px]">
         {children}
       </main>
     </div>

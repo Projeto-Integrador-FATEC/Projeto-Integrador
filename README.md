@@ -63,8 +63,8 @@ Abra [http://localhost:3000](http://localhost:3000) no seu navegador para ver o 
 |------|--------|--------|
 | Daniel Vigano da Silva | Scrum Master | [@DanielV17](https://github.com/DanielV17) |
 | Ruan Silva Meira | Dev Team | - |
-| Vinicíus Martins | Dev Team | - |
-| Vinicíus Silva Dornelas | Dev Team | - |
+| Vinicius Martins | Dev Team | - |
+| Vinícius Silva Dornelas | Dev Team | - |
 
 ## 📬 Contato
 

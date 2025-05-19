@@ -1,11 +1,63 @@
+"use client";
+
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { ArrowLeft, Upload, Image as ImageIcon } from "lucide-react";
 import Link from "next/link";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { createCourseService, CreateCourseData } from "@/services/create-course-service";
+import { toast } from "sonner";
 
 export default function CadastrarCursoPage() {
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setIsLoading(true);
+
+    try {
+      const formData = new FormData(e.currentTarget);
+      
+      const courseData: CreateCourseData = {
+        name: formData.get("name") as string,
+        description: formData.get("description") as string,
+        workload: Number(formData.get("workload")),
+        level: formData.get("level") as "iniciante" | "intermediario" | "avancado",
+        image: selectedImage || undefined,
+      };
+
+      const response = await fetch("http://localhost:3000/api/courses", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error);
+      }
+
+      toast.success("Curso cadastrado com sucesso!");
+      router.push("/");
+    } catch (error: any) {
+      console.error("Error creating course:", error);
+      toast.error(error.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setSelectedImage(file);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <div className="max-w-4xl mx-auto px-4 py-8">
@@ -18,7 +70,7 @@ export default function CadastrarCursoPage() {
         </div>
 
         <Card className="p-6">
-          <form className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-6">
             {/* Informações básicas */}
             <div className="space-y-4">
               <h2 className="text-xl font-semibold">Informações Básicas</h2>
@@ -28,6 +80,8 @@ export default function CadastrarCursoPage() {
                   Nome do Curso *
                 </label>
                 <Input 
+                  name="name"
+                  required
                   placeholder="Ex: Curso de Informática Básica" 
                   className="shadow-md focus:ring-2 focus:ring-violet-400"
                 />
@@ -38,6 +92,8 @@ export default function CadastrarCursoPage() {
                   Descrição *
                 </label>
                 <Textarea 
+                  name="description"
+                  required
                   placeholder="Descreva o conteúdo e objetivos do curso..." 
                   className="shadow-md focus:ring-2 focus:ring-violet-400 min-h-[120px]"
                 />
@@ -49,6 +105,8 @@ export default function CadastrarCursoPage() {
                     Carga Horária (horas) *
                   </label>
                   <Input 
+                    name="workload"
+                    required
                     type="number" 
                     placeholder="Ex: 40" 
                     className="shadow-md focus:ring-2 focus:ring-violet-400"
@@ -58,7 +116,11 @@ export default function CadastrarCursoPage() {
                   <label className="block text-sm font-medium text-zinc-700 mb-2">
                     Nível do Curso *
                   </label>
-                  <select className="w-full h-9 rounded-md border border-input px-3 py-1 text-sm shadow-sm focus:ring-2 focus:ring-violet-400">
+                  <select 
+                    name="level"
+                    required
+                    className="w-full h-9 rounded-md border border-input px-3 py-1 text-sm shadow-sm focus:ring-2 focus:ring-violet-400"
+                  >
                     <option value="">Selecione o nível</option>
                     <option value="iniciante">Iniciante</option>
                     <option value="intermediario">Intermediário</option>
@@ -79,71 +141,47 @@ export default function CadastrarCursoPage() {
                     <p className="font-medium">Arraste uma imagem ou clique para selecionar</p>
                     <p className="text-sm">PNG, JPG até 5MB</p>
                   </div>
-                  <Button variant="outline" className="mt-2 border-violet-500 text-violet-500 hover:bg-violet-50">
+                  <input
+                    type="file"
+                    id="image"
+                    accept="image/*"
+                    onChange={handleImageChange}
+                    className="hidden"
+                  />
+                  <Button 
+                    type="button"
+                    variant="outline" 
+                    className="mt-2 border-violet-500 text-violet-500 hover:bg-violet-50"
+                    onClick={() => document.getElementById("image")?.click()}
+                  >
                     <Upload className="w-4 h-4 mr-2" />
                     Selecionar Imagem
                   </Button>
+                  {selectedImage && (
+                    <p className="text-sm text-violet-500 mt-2">
+                      {selectedImage.name}
+                    </p>
+                  )}
                 </div>
-              </div>
-            </div>
-
-            {/* Conteúdo do curso */}
-            <div className="space-y-4">
-              <h2 className="text-xl font-semibold">Conteúdo do Curso</h2>
-              
-              <div>
-                <label className="block text-sm font-medium text-zinc-700 mb-2">
-                  Módulos e Aulas *
-                </label>
-                <div className="space-y-4">
-                  <div className="p-4 border border-violet-200 rounded-lg">
-                    <div className="flex justify-between items-center mb-2">
-                      <h3 className="font-medium">Módulo 1: Introdução</h3>
-                      <Button variant="ghost" className="text-red-500 hover:text-red-600 hover:bg-red-50">
-                        Remover
-                      </Button>
-                    </div>
-                    <div className="space-y-2">
-                      <div className="flex items-center gap-2 text-sm text-zinc-600">
-                        <div className="w-1.5 h-1.5 rounded-full bg-violet-500"></div>
-                        Aula 1: Apresentação do Curso
-                      </div>
-                      <div className="flex items-center gap-2 text-sm text-zinc-600">
-                        <div className="w-1.5 h-1.5 rounded-full bg-violet-500"></div>
-                        Aula 2: Configuração do Ambiente
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <Button variant="outline" className="w-full border-violet-500 text-violet-500 hover:bg-violet-50">
-                    + Adicionar Módulo
-                  </Button>
-                </div>
-              </div>
-            </div>
-
-            {/* Requisitos */}
-            <div className="space-y-4">
-              <h2 className="text-xl font-semibold">Requisitos</h2>
-              
-              <div>
-                <label className="block text-sm font-medium text-zinc-700 mb-2">
-                  Pré-requisitos
-                </label>
-                <Textarea 
-                  placeholder="Liste os conhecimentos ou habilidades necessárias para realizar o curso..." 
-                  className="shadow-md focus:ring-2 focus:ring-violet-400 min-h-[100px]"
-                />
               </div>
             </div>
 
             {/* Botões de ação */}
             <div className="flex gap-4 pt-4">
-              <Button variant="outline" className="flex-1 border-violet-500 text-violet-500 hover:bg-violet-50">
+              <Button 
+                type="button"
+                variant="outline" 
+                className="flex-1 border-violet-500 text-violet-500 hover:bg-violet-50"
+                onClick={() => router.push("/")}
+              >
                 Cancelar
               </Button>
-              <Button className="flex-1 bg-violet-500 hover:bg-violet-600 text-white font-semibold shadow-md">
-                Cadastrar Curso
+              <Button 
+                type="submit"
+                disabled={isLoading}
+                className="flex-1 bg-violet-500 hover:bg-violet-600 text-white font-semibold shadow-md"
+              >
+                {isLoading ? "Cadastrando..." : "Cadastrar Curso"}
               </Button>
             </div>
           </form>

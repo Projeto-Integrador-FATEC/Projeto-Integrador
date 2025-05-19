@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 export default function CursosPage() {
   return (
@@ -16,7 +17,11 @@ export default function CursosPage() {
             <CardDescription className="mb-4">
               Curso gratuito e de qualidade para capacitação e qualificação profissional
             </CardDescription>
-            <Button className="bg-violet-500 hover:bg-violet-600 text-white w-32 cursor-pointer">Participar</Button>
+            <Link href="/curso-details/1">
+            <Button className="bg-violet-500 hover:bg-violet-600 text-white w-32 cursor-pointer">
+              Participar
+            </Button>
+            </Link>
           </CardContent>
         </Card>
       </main>

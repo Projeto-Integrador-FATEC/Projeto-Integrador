@@ -8,4 +8,9 @@ alwaysApply: true
 
 ## Interface
 
--A interface do projeto deve ser feita utilizando os componentes do shadcn ui
+- A interface do projeto deve ser feita utilizando os componentes do shadcn ui
+- Os componentes devem ser feitos utilizando composition pattern
+
+## Estrutura
+
+- Todas interações com serviços externos devem ser feitos através de uma classe dentro da pasta services

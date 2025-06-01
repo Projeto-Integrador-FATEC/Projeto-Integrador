@@ -1,26 +1,28 @@
 import api from "@/lib/axios";
 
 export interface CreateCourseData {
-  name: string;
-  description: string;
-  workload: number;
-  level: "iniciante" | "intermediario" | "avancado";
+  nome: string;
+  descricao: string;
+  cargaHoraria: number;
+  nivel: "iniciante" | "intermediario" | "avancado";
   image?: File;
 }
 
 export async function createCourseService(data: CreateCourseData) {
   const formData = new FormData();
   
-  formData.append("name", data.name);
-  formData.append("description", data.description);
-  formData.append("workload", data.workload.toString());
-  formData.append("level", data.level);
+  console.log("data", data);
+
+  // Enviar o JSON como Blob
+  formData.append("curso", new Blob(
+    [JSON.stringify(data)], { type: "application/json" }
+  ));
   
   if (data.image) {
-    formData.append("image", data.image);
+    formData.append("imagem", data.image);
   }
 
-  const response = await api.post("/courses", formData, {
+  const response = await api.post("/api/cursos", formData, {
     headers: {
       "Content-Type": "multipart/form-data",
     },

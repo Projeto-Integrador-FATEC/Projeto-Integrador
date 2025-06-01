@@ -8,7 +8,6 @@ import { ArrowLeft, Upload, Image as ImageIcon } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { createCourseService, CreateCourseData } from "@/services/create-course-service";
 import { toast } from "sonner";
 
 export default function CadastrarCursoPage() {
@@ -23,13 +22,10 @@ export default function CadastrarCursoPage() {
     try {
       const formData = new FormData(e.currentTarget);
       
-      const courseData: CreateCourseData = {
-        name: formData.get("name") as string,
-        description: formData.get("description") as string,
-        workload: Number(formData.get("workload")),
-        level: formData.get("level") as "iniciante" | "intermediario" | "avancado",
-        image: selectedImage || undefined,
-      };
+      // Adiciona a imagem ao FormData se ela existir
+      if (selectedImage) {
+        formData.append("image", selectedImage);
+      }
 
       const response = await fetch("http://localhost:3000/api/courses", {
         method: "POST",

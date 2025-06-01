@@ -17,10 +17,10 @@ export async function POST(request: Request) {
     const formData = await request.formData();
     
     const courseData = {
-      name: formData.get("name") as string,
-      description: formData.get("description") as string,
-      workload: Number(formData.get("workload")),
-      level: formData.get("level") as "iniciante" | "intermediario" | "avancado",
+      nome: formData.get("name") as string,
+      descricao: formData.get("description") as string,
+      cargaHoraria: Number(formData.get("workload")),
+      nivel: formData.get("level") as "iniciante" | "intermediario" | "avancado",
       image: formData.get("image") as File,
     };
 
@@ -40,8 +40,8 @@ export async function POST(request: Request) {
       { message: "Curso criado com sucesso" },
       { status: 201 }
     );
-  } catch (error) {
-    console.error("Erro ao criar curso:", error);
+  } catch (error: any) {
+    console.error("Erro ao criar curso:", error.response?.data);
     return NextResponse.json(
       { error: "Erro interno do servidor" },
       { status: 500 }

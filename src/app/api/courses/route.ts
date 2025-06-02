@@ -2,6 +2,20 @@ import { NextResponse } from "next/server";
 import { auth } from "../../../../auth";
 import { createCourseService } from "@/services/create-course-service";
 import { validateCreateCourse } from "@/app/DTOs/create-course.dto";
+import { getCoursesService } from "@/services/get-courses-service";
+
+export async function GET() {
+  try {
+    const courses = await getCoursesService();
+    return NextResponse.json(courses);
+  } catch (error: any) {
+    console.error("Erro ao buscar cursos:", error.response?.data);
+    return NextResponse.json(
+      { error: "Erro interno do servidor" },
+      { status: 500 }
+    );
+  }
+}
 
 export async function POST(request: Request) {
   try {

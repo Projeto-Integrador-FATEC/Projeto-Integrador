@@ -14,3 +14,4 @@ alwaysApply: true
 ## Estrutura
 
 - Todas interações com serviços externos devem ser feitos através de uma classe dentro da pasta services
+- Interações em páginas "use client" devem sempre usar api routes quando precisar interagir com algum service

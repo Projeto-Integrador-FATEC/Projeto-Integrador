@@ -55,67 +55,67 @@ export default function CadastrarCursoPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background dark:bg-zinc-900">
       <div className="max-w-4xl mx-auto px-4 py-8">
         {/* Cabeçalho */}
         <div className="flex items-center gap-4 mb-8">
           <Link href="/" className="text-violet-500 hover:text-violet-600">
             <ArrowLeft className="w-6 h-6" />
           </Link>
-          <h1 className="text-3xl font-bold text-zinc-900">Cadastrar Novo Curso</h1>
+          <h1 className="text-3xl font-bold text-zinc-900 dark:text-white">Cadastrar Novo Curso</h1>
         </div>
 
-        <Card className="p-6">
+        <Card className="p-6 bg-white dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700">
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Informações básicas */}
             <div className="space-y-4">
-              <h2 className="text-xl font-semibold">Informações Básicas</h2>
+              <h2 className="text-xl font-semibold text-zinc-900 dark:text-white">Informações Básicas</h2>
               
               <div>
-                <label className="block text-sm font-medium text-zinc-700 mb-2">
+                <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">
                   Nome do Curso *
                 </label>
-                <Input 
+                <Input
                   name="name"
                   required
                   placeholder="Ex: Curso de Informática Básica" 
-                  className="shadow-md focus:ring-2 focus:ring-violet-400"
+                  className="shadow-md focus:ring-2 focus:ring-violet-400 bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-white"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-zinc-700 mb-2">
+                <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">
                   Descrição *
                 </label>
-                <Textarea 
+                <Textarea
                   name="description"
                   required
                   placeholder="Descreva o conteúdo e objetivos do curso..." 
-                  className="shadow-md focus:ring-2 focus:ring-violet-400 min-h-[120px]"
+                  className="shadow-md focus:ring-2 focus:ring-violet-400 min-h-[120px] bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-white"
                 />
               </div>
 
               <div className="grid md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-zinc-700 mb-2">
+                  <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">
                     Carga Horária (horas) *
                   </label>
-                  <Input 
+                  <Input
                     name="workload"
                     required
                     type="number" 
                     placeholder="Ex: 40" 
-                    className="shadow-md focus:ring-2 focus:ring-violet-400"
+                    className="shadow-md focus:ring-2 focus:ring-violet-400 bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-white"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-zinc-700 mb-2">
+                  <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">
                     Nível do Curso *
                   </label>
                   <select 
                     name="level"
                     required
-                    className="w-full h-9 rounded-md border border-input px-3 py-1 text-sm shadow-sm focus:ring-2 focus:ring-violet-400"
+                    className="w-full h-9 rounded-md border border-input px-3 py-1 text-sm shadow-sm focus:ring-2 focus:ring-violet-400 bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-white"
                   >
                     <option value="">Selecione o nível</option>
                     <option value="iniciante">Iniciante</option>
@@ -128,12 +128,12 @@ export default function CadastrarCursoPage() {
 
             {/* Imagem do curso */}
             <div className="space-y-4">
-              <h2 className="text-xl font-semibold">Imagem do Curso</h2>
+              <h2 className="text-xl font-semibold text-zinc-900 dark:text-white">Imagem do Curso</h2>
               
-              <div className="border-2 border-dashed border-violet-200 rounded-lg p-8 text-center">
+              <div className="border-2 border-dashed border-violet-200 dark:border-violet-800 rounded-lg p-8 text-center">
                 <div className="flex flex-col items-center gap-2">
                   <ImageIcon className="w-12 h-12 text-violet-500" />
-                  <div className="text-zinc-600">
+                  <div className="text-zinc-600 dark:text-zinc-400">
                     <p className="font-medium">Arraste uma imagem ou clique para selecionar</p>
                     <p className="text-sm">PNG, JPG até 5MB</p>
                   </div>
@@ -147,7 +147,7 @@ export default function CadastrarCursoPage() {
                   <Button 
                     type="button"
                     variant="outline" 
-                    className="mt-2 border-violet-500 text-violet-500 hover:bg-violet-50"
+                    className="mt-2 border-violet-500 text-violet-500 hover:bg-violet-50 dark:hover:bg-violet-900"
                     onClick={() => document.getElementById("image")?.click()}
                   >
                     <Upload className="w-4 h-4 mr-2" />
@@ -167,12 +167,12 @@ export default function CadastrarCursoPage() {
               <Button 
                 type="button"
                 variant="outline" 
-                className="flex-1 border-violet-500 text-violet-500 hover:bg-violet-50"
+                className="flex-1 border-violet-500 text-violet-500 hover:bg-violet-50 dark:hover:bg-violet-900"
                 onClick={() => router.push("/")}
               >
                 Cancelar
               </Button>
-              <Button 
+              <Button
                 type="submit"
                 disabled={isLoading}
                 className="flex-1 bg-violet-500 hover:bg-violet-600 text-white font-semibold shadow-md"

@@ -32,16 +32,18 @@ export default function CursosPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-screen bg-background dark:bg-zinc-900 flex flex-col">
       <main className="flex flex-col items-start max-w-6xl w-full mx-auto mt-12 px-4">
-        <h2 className="text-3xl font-bold mb-10">Vamos começar a aprender,<span className="text-violet-500">Daniel</span></h2>
+        <h2 className="text-3xl font-bold mb-10 text-zinc-900 dark:text-white">
+          Vamos começar a aprender,<span className="text-violet-500">Daniel</span>
+        </h2>
         
         {isLoading ? (
-          <div>Carregando cursos...</div>
+          <div className="text-zinc-600 dark:text-zinc-400">Carregando cursos...</div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
             {courses.map((course) => (
-              <Card key={course.id} className="w-full pb-6 pt-0">
+              <Card key={course.id} className="w-full pb-6 pt-0 bg-white dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700">
                 <Image 
                   src={"http://localhost:4080/imagens/" + course.imagemPath || "/img_curso.svg"} 
                   alt={course.nome} 
@@ -50,14 +52,14 @@ export default function CursosPage() {
                   className="w-full h-[180px] rounded-t-xl object-cover" 
                 />
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-lg">{course.nome}</CardTitle>
+                  <CardTitle className="text-lg text-zinc-900 dark:text-white">{course.nome}</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <CardDescription className="mb-4">
+                  <CardDescription className="mb-4 text-zinc-600 dark:text-zinc-400">
                     {course.descricao}
                   </CardDescription>
                   <div className="flex justify-between items-center">
-                    <span className="text-sm text-zinc-600">
+                    <span className="text-sm text-zinc-600 dark:text-zinc-400">
                       {course.cargaHoraria}h • {course.nivel}
                     </span>
                     <Link href={`/curso-details/${course.id}`}>

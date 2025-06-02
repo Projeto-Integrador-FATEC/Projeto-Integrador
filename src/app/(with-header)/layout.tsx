@@ -6,7 +6,7 @@ export default function WithHeaderLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-background dark:bg-zinc-900">
       <div className="fixed top-0 left-0 right-0 z-50">
         <Header />
       </div>

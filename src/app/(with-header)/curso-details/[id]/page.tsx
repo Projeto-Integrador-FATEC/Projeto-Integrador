@@ -1,23 +1,68 @@
+"use client";
+
 import { Card } from "@/components/ui/card";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { ThumbsUp, Clock, Users, CalendarDays, FileText } from "lucide-react";
+import { useEffect, useState } from "react";
+import { CourseDetails } from "@/services/get-course-details-service";
+import { toast } from "sonner";
+import { useParams } from "next/navigation";
 
 export default function CursoDetailsPage() {
+  const params = useParams();
+  const [course, setCourse] = useState<CourseDetails | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadCourseDetails() {
+      try {
+        const response = await fetch(`/api/courses/${params.id}`);
+        if (!response.ok) {
+          throw new Error("Erro ao carregar detalhes do curso");
+        }
+        const data = await response.json();
+        setCourse(data);
+      } catch (error) {
+        toast.error("Erro ao carregar detalhes do curso");
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    loadCourseDetails();
+  }, [params.id]);
+
+  if (isLoading) {
+    return <div>Carregando...</div>;
+  }
+
+  if (!course) {
+    return <div>Curso não encontrado</div>;
+  }
+
   return (
     <div className="min-h-screen bg-background flex flex-col mb-8">
       {/* Banner do curso */}
       <section className="w-full bg-cyan-100 py-12 px-4 flex flex-col md:flex-row items-start md:items-center justify-between relative">
         <div className="flex justify-between items-center w-full max-w-6xl mx-auto">
           <div className="max-w-4xl">
-            <h1 className="text-5xl font-bold text-zinc-900 mb-4">Curso de Informática</h1>
+            <h1 className="text-5xl font-bold text-zinc-900 mb-4">{course.nome}</h1>
           </div>
 
           <Card className="absolute md:static right-8 top-8 md:ml-8 w-[320px] shadow-lg p-6 flex flex-col gap-2">
-            <div className="flex items-center gap-2 text-zinc-700"><ThumbsUp className="w-5 h-5" /> Avaliação <span className="ml-auto font-semibold">9.4</span></div>
-            <div className="flex items-center gap-2 text-zinc-700"><Clock className="w-5 h-5" /> Carga Horária <span className="ml-auto font-semibold">8h</span></div>
-            <div className="flex items-center gap-2 text-zinc-700"><CalendarDays className="w-5 h-5" /> Última Atualização <span className="ml-auto font-semibold">17/01/2006</span></div>
-            <div className="flex items-center gap-2 text-zinc-700"><Users className="w-5 h-5" /> Alunos <span className="ml-auto font-semibold">4000</span></div>
+            <div className="flex items-center gap-2 text-zinc-700">
+              <ThumbsUp className="w-5 h-5" /> Avaliação <span className="ml-auto font-semibold">{course.avaliacao || 9.4}</span>
+            </div>
+            <div className="flex items-center gap-2 text-zinc-700">
+              <Clock className="w-5 h-5" /> Carga Horária <span className="ml-auto font-semibold">{course.cargaHoraria}h</span>
+            </div>
+            <div className="flex items-center gap-2 text-zinc-700">
+              <CalendarDays className="w-5 h-5" /> Última Atualização <span className="ml-auto font-semibold">{course.ultimaAtualizacao || "17/05/2025"}</span>
+            </div>
+            <div className="flex items-center gap-2 text-zinc-700">
+              <Users className="w-5 h-5" /> Alunos <span className="ml-auto font-semibold">{course.totalAlunos || 4000}</span>
+            </div>
           </Card>
         </div>
       </section>
@@ -36,18 +81,28 @@ export default function CursoDetailsPage() {
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
           <div>
             <div className="text-xl font-semibold mb-2">Curso Oferecido Por</div>
-            <Image src="/bradesco_img.svg" alt="Fundação Bradesco" width={100} height={40} className="object-contain mb-2" />
+            <Image 
+              src={course?.instituicao?.logo || "/bradesco_img.svg"} 
+              alt={course?.instituicao?.nome || "Fundação Bradesco"} 
+              width={100} 
+              height={40} 
+              className="object-contain mb-2" 
+            />
           </div>
           <div className="text-right mt-6 md:mt-0">
             <div className="text-xl font-semibold">Total Arrecadado</div>
-            <div className="text-lg font-bold text-zinc-700">R$3.500,00</div>
+            <div className="text-lg font-bold text-zinc-700">
+              R${course.totalArrecadado?.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) || "0,00"}
+            </div>
           </div>
         </div>
         
         <Card className="p-6">
-          <div className="flex items-center gap-2 mb-2 text-xl font-semibold"><FileText className="w-6 h-6" />Descrição</div>
+          <div className="flex items-center gap-2 mb-2 text-xl font-semibold">
+            <FileText className="w-6 h-6" />Descrição
+          </div>
           <div className="text-zinc-700">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla non massa pharetra, euismod urna a, ultrices eros. Mauris quis eleifend velit. Donec magna tellus, fringilla a justo pellentesque, semper tincidunt ex. Suspendisse suscipit sem id mi fringilla, ut posuere eros ullamcorper. Sed venenatis sit amet diam nec interdum. Integer aliquam interdum sapien, id fringilla turpis pellentesque vel. Nulla elementum laoreet enim sit amet lobortis. Integer ornare congue mi, et porttitor augue gravida nec.
+            {course.descricao}
           </div>
         </Card>
       </section>

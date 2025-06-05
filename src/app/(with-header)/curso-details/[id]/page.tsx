@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import { CourseDetails } from "@/services/get-course-details-service";
 import { toast } from "sonner";
 import { useParams } from "next/navigation";
+import Link from "next/link";
 
 export default function CursoDetailsPage() {
   const params = useParams();
@@ -73,7 +74,9 @@ export default function CursoDetailsPage() {
           <Button className="bg-violet-500 hover:bg-violet-600 text-white font-semibold shadow-md">Participar</Button>
           <Button variant="outline" className="border-violet-500 text-violet-500 dark:text-violet-400 font-semibold shadow-md">Adicionar um plano de estudos</Button>
         </div>
-        <Button className="bg-violet-500 hover:bg-violet-600 text-white font-semibold shadow-md">Realizar Doação</Button>
+        <Button className="bg-violet-500 hover:bg-violet-600 text-white font-semibold shadow-md">
+          <Link href="/doacao">Realizar Doação</Link>
+        </Button>
       </div>
 
       {/* Informações do curso */}

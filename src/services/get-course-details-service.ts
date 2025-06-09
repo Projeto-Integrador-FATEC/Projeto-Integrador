@@ -17,9 +17,6 @@ export interface CourseDetails {
 
 export async function getCourseDetailsService(id: number): Promise<CourseDetails> {
   const response = await api.get(`/api/cursos/${id}`);
-
-
-  console.log("response", response);
   
   if (!response.data) {
     throw new Error("Erro ao buscar detalhes do curso");

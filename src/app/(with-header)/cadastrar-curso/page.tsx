@@ -115,7 +115,7 @@ export default function CadastrarCursoPage() {
                   <select 
                     name="level"
                     required
-                    className="w-full h-9 rounded-md border border-input px-3 py-1 text-sm shadow-sm focus:ring-2 focus:ring-violet-400 bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-white"
+                    className="w-full h-9 rounded-md border px-3 py-1 text-sm shadow-sm focus:ring-2 focus:ring-violet-400 bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-white"
                   >
                     <option value="">Selecione o nível</option>
                     <option value="iniciante">Iniciante</option>

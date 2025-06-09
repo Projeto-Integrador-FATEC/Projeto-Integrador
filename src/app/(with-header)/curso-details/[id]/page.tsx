@@ -61,9 +61,6 @@ export default function CursoDetailsPage() {
             <div className="flex items-center gap-2 text-zinc-700 dark:text-zinc-300">
               <CalendarDays className="w-5 h-5" /> Última Atualização <span className="ml-auto font-semibold">{course.ultimaAtualizacao || "17/05/2025"}</span>
             </div>
-            <div className="flex items-center gap-2 text-zinc-700 dark:text-zinc-300">
-              <Users className="w-5 h-5" /> Alunos <span className="ml-auto font-semibold">{course.totalAlunos || 4000}</span>
-            </div>
           </Card>
         </div>
       </section>
@@ -71,8 +68,8 @@ export default function CursoDetailsPage() {
       {/* Botões de ação */}
       <div className="flex justify-between items-center w-full max-w-6xl mx-auto mt-8 px-4">
         <div className="flex gap-4">
-          <Button className="bg-violet-500 hover:bg-violet-600 text-white font-semibold shadow-md">Participar</Button>
-          <Button variant="outline" className="border-violet-500 text-violet-500 dark:text-violet-400 font-semibold shadow-md">Adicionar um plano de estudos</Button>
+          <Button className="bg-violet-500 hover:bg-violet-600 text-white font-semibold shadow-md"><Link target="_blank" href={course.url}>Participar</Link></Button>
+          <Button variant="outline" className="border-violet-500 text-violet-500 dark:text-violet-400 font-semibold shadow-md">Adicionar avaliação</Button>
         </div>
         <Button className="bg-violet-500 hover:bg-violet-600 text-white font-semibold shadow-md">
           <Link href="/doacao">Realizar Doação</Link>
@@ -84,13 +81,7 @@ export default function CursoDetailsPage() {
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
           <div>
             <div className="text-xl font-semibold mb-2 text-zinc-900 dark:text-white">Curso Oferecido Por</div>
-            <Image 
-              src={course?.instituicao?.logo || "/bradesco_img.svg"} 
-              alt={course?.instituicao?.nome || "Fundação Bradesco"} 
-              width={100} 
-              height={40} 
-              className="object-contain mb-2" 
-            />
+            <span className="text-zinc-700 dark:text-zinc-300">{course.provider}</span>
           </div>
           <div className="text-right mt-6 md:mt-0">
             <div className="text-xl font-semibold text-zinc-900 dark:text-white">Total Arrecadado</div>
@@ -100,7 +91,7 @@ export default function CursoDetailsPage() {
           </div>
         </div>
         
-        <Card className="p-6 bg-white dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700">
+        <Card className="p-6 mt-24 bg-white dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700">
           <div className="flex items-center gap-2 mb-2 text-xl font-semibold text-zinc-900 dark:text-white">
             <FileText className="w-6 h-6" />Descrição
           </div>

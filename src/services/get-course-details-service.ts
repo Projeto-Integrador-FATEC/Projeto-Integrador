@@ -11,10 +11,8 @@ export interface CourseDetails {
   ultimaAtualizacao: string;
   totalAlunos: number;
   totalArrecadado: number;
-  instituicao: {
-    nome: string;
-    logo: string;
-  };
+  provider: string;
+  url: string;
 }
 
 export async function getCourseDetailsService(id: number): Promise<CourseDetails> {

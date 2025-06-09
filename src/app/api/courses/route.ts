@@ -36,6 +36,8 @@ export async function POST(request: Request) {
       cargaHoraria: Number(formData.get("workload")),
       nivel: formData.get("level") as "iniciante" | "intermediario" | "avancado",
       image: formData.get("image") as File,
+      provider: formData.get("provider") as string,
+      url: formData.get("url") as string,
     };
 
     const validation = validateCreateCourse(courseData);

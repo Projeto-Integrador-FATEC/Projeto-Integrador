@@ -34,14 +34,14 @@ export default function CadastrarCursoPage() {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error);
+        throw new Error(errorData.error || "Erro ao cadastrar curso");
       }
 
       toast.success("Curso cadastrado com sucesso!");
       router.push("/");
     } catch (error: any) {
       console.error("Error creating course:", error);
-      toast.error(error.message);
+      toast.error(error.message || "Erro ao cadastrar curso");
     } finally {
       setIsLoading(false);
     }
@@ -123,6 +123,31 @@ export default function CadastrarCursoPage() {
                     <option value="avancado">Avançado</option>
                   </select>
                 </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">
+                  Quem fornece o curso *
+                </label>
+                <Input
+                  name="provider"
+                  required
+                  placeholder="Ex: Universidade XYZ, Professor João Silva" 
+                  className="shadow-md focus:ring-2 focus:ring-violet-400 bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-white"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">
+                  URL do Curso *
+                </label>
+                <Input
+                  name="url"
+                  required
+                  type="url"
+                  placeholder="https://exemplo.com/curso" 
+                  className="shadow-md focus:ring-2 focus:ring-violet-400 bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-white"
+                />
               </div>
             </div>
 

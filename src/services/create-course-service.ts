@@ -5,6 +5,8 @@ export interface CreateCourseData {
   descricao: string;
   cargaHoraria: number;
   nivel: "iniciante" | "intermediario" | "avancado";
+  provider: string;
+  url: string;
   image?: File;
 }
 

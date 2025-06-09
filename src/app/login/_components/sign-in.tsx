@@ -55,22 +55,22 @@ export function SignIn() {
       onSubmit={handleSubmit}
       className="w-full flex flex-col gap-4"
     >
-      <label className="flex flex-col gap-2">
+      <label className="flex flex-col gap-2 text-zinc-900 dark:text-zinc-100">
         Email
         <Input 
           name="email" 
           type="email" 
           required
-          className="bg-cyan-200 shadow-md focus:ring-2 focus:ring-violet-400"
+          className="bg-cyan-200 dark:bg-zinc-800 shadow-md focus:ring-2 focus:ring-violet-400 dark:text-zinc-100"
         />
       </label>
-      <label className="flex flex-col gap-2">
-        Password
+      <label className="flex flex-col gap-2 text-zinc-900 dark:text-zinc-100">
+        Senha
         <Input 
           name="password" 
           type="password" 
           required
-          className="bg-cyan-200 shadow-md focus:ring-2 focus:ring-violet-400"
+          className="bg-cyan-200 dark:bg-zinc-800 shadow-md focus:ring-2 focus:ring-violet-400 dark:text-zinc-100"
         />
       </label>
       <Button 

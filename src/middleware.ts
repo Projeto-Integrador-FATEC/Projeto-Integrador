@@ -17,6 +17,6 @@ export default auth((req: any) => {
 export const config = {
     matcher: [
         // Protege todas as rotas exceto as rotas do sistema
-        "/((?!api|_next/static|_next/image|favicon.ico|login_img.svg|logo_img.svg).*)",
+        "/((?!api|_next/static|_next/image|favicon.ico|login_img.png|logo_img.svg).*)",
     ]
 }

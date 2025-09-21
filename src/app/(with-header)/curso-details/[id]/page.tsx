@@ -11,7 +11,7 @@ import Link from "next/link";
 import { RatingModal } from "@/components/rating-modal";
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { getCourseComments, Comment } from "@/services/get-course-comments";
+import { Comment } from "@/services/get-course-comments";
 
 export default function CursoDetailsPage() {
   const params = useParams();
@@ -26,36 +26,18 @@ export default function CursoDetailsPage() {
     async function loadCourseDetails() {
       try {
         const response = await fetch(`/api/courses/${params.id}`);
-        if (!response.ok) {
+
+        const commentsResponse = await fetch(`/api/comments/${params.id}`);
+        if (!response.ok || !commentsResponse.ok) {
           throw new Error("Erro ao carregar detalhes do curso");
         }
         const data = await response.json();
         setCourse(data);
         
-        // Comentários de exemplo (em produção, viriam da API)
-        setComments([
-          {
-            id: "1",
-            author: "Maria Silva",
-            content: "Excelente curso! Muito didático e bem estruturado. Aprendi muito sobre os conceitos fundamentais.",
-            date: "2024-01-15",
-            rating: 5
-          },
-          {
-            id: "2", 
-            author: "João Santos",
-            content: "Curso muito bom, mas poderia ter mais exemplos práticos. No geral, recomendo!",
-            date: "2024-01-10",
-            rating: 4
-          },
-          {
-            id: "3",
-            author: "Ana Costa",
-            content: "Adorei o curso! O instrutor explica de forma muito clara e os materiais são de ótima qualidade.",
-            date: "2024-01-05",
-            rating: 5
-          }
-        ]);
+        const comments = await commentsResponse.json();
+        console.log("comments recebidos:", comments);
+        setComments(comments);
+
       } catch (error) {
         toast.error("Erro ao carregar detalhes do curso");
       } finally {
@@ -84,21 +66,32 @@ export default function CursoDetailsPage() {
     setIsSubmittingComment(true);
     
     try {
-      // Simular envio para API (em produção, seria uma chamada real)
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      const comment: Comment = {
-        id: Date.now().toString(),
-        author: "Usuário Atual", // Em produção, viria do contexto de autenticação
-        content: newComment,
-        date: new Date().toISOString().split('T')[0],
-        rating: 5 // Poderia ser um campo separado
-      };
-      
-      setComments(prev => [comment, ...prev]);
+      const commentsResponse = await fetch(`/api/comments/cadastrar-comments`, {
+        method: "POST",
+        body: JSON.stringify({
+          texto: newComment,
+          email: "danielvigano17@gmail.com",
+          cursoId: params.id as string
+        })
+      });
+
+      if (!commentsResponse.ok) {
+        throw new Error("Erro ao cadastrar comentário");
+      }
+
+      const commentResponse : any = await commentsResponse.json();
+      console.log("Resposta do comentário:", commentResponse);
+
+      // Recarregar os comentários para pegar a estrutura atualizada da API
+      const updatedCommentsResponse = await fetch(`/api/comments/${params.id}`);
+      if (updatedCommentsResponse.ok) {
+        const updatedComments = await updatedCommentsResponse.json();
+        setComments(updatedComments);
+      }
       setNewComment("");
       toast.success("Comentário adicionado com sucesso!");
     } catch (error) {
+      console.log("error", error);
       toast.error("Erro ao adicionar comentário");
     } finally {
       setIsSubmittingComment(false);
@@ -222,33 +215,25 @@ export default function CursoDetailsPage() {
               comments.map((comment) => (
                 <div key={comment.id} className="flex gap-4 p-4 bg-zinc-50 dark:bg-zinc-900 rounded-lg border border-zinc-200 dark:border-zinc-700">
                   <Avatar className="w-10 h-10 flex-shrink-0">
-                    <AvatarImage src={comment.avatar} />
+                    <AvatarImage src={""} />
                     <AvatarFallback className="bg-violet-500 text-white">
-                      {comment.author.split(' ').map(n => n[0]).join('').toUpperCase()}
+                      {comment.user.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)}
                     </AvatarFallback>
                   </Avatar>
                   
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-2">
-                      <h4 className="font-semibold text-zinc-900 dark:text-white">{comment.author}</h4>
-                      <div className="flex items-center gap-1">
-                        {[...Array(5)].map((_, i) => (
-                          <Star
-                            key={i}
-                            className={`w-4 h-4 ${
-                              i < comment.rating
-                                ? 'fill-yellow-400 text-yellow-400'
-                                : 'text-zinc-300 dark:text-zinc-600'
-                            }`}
-                          />
-                        ))}
-                      </div>
+                      <h4 className="font-semibold text-zinc-900 dark:text-white">{comment.user.name}</h4>
+                      <span className="text-sm text-zinc-500 dark:text-zinc-400">
+                        ({comment.user.email})
+                      </span>
+                      
                       <span className="text-sm text-zinc-500 dark:text-zinc-400">
                         {new Date(comment.date).toLocaleDateString('pt-BR')}
                       </span>
                     </div>
                     <p className="text-zinc-700 dark:text-zinc-300 leading-relaxed">
-                      {comment.content}
+                      {comment.texto}
                     </p>
                   </div>
                 </div>

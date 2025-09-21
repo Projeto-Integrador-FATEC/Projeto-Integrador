@@ -16,8 +16,6 @@ export function RatingModal({ isOpen, onClose, courseId, onRatingSubmit }: Ratin
   const [rating, setRating] = useState<number>(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  console.log("session", session);
-
   const handleSubmit = async () => {
     if (rating === 0) {
       toast.error("Por favor, selecione uma avaliação");

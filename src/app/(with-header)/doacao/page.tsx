@@ -3,8 +3,7 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ArrowLeft } from "lucide-react";
-import Link from "next/link";
+import { BackButton } from "@/components/ui/back-button";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -89,11 +88,9 @@ export default function DoacaoPage() {
   return (
     <div className="min-h-screen bg-background dark:bg-zinc-900">
       <div className="max-w-4xl mx-auto px-4 py-8">
+        <BackButton className="mb-4" />
         {/* Cabeçalho */}
         <div className="flex items-center gap-4 mb-8">
-          <Link href="/" className="text-violet-500 hover:text-violet-600">
-            <ArrowLeft className="w-6 h-6" />
-          </Link>
           <h1 className="text-3xl font-bold text-zinc-900 dark:text-white">Fazer uma Doação</h1>
         </div>
 

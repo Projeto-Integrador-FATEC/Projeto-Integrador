@@ -9,6 +9,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Course } from "@/services/get-courses-service";
 import { toast } from "sonner";
+import { BackButton } from "@/components/ui/back-button";
 
 export default function CursosPage() {
   const [courses, setCourses] = useState<Course[]>([]);
@@ -46,6 +47,9 @@ export default function CursosPage() {
   return (
     <div className="min-h-screen bg-background dark:bg-zinc-900 flex flex-col">
       <main className="flex flex-col items-start max-w-6xl w-full mx-auto mt-12 px-4">
+
+        <BackButton className="mb-4" />
+        
         <h2 className="text-3xl font-bold mb-6 text-zinc-900 dark:text-white">
           Vamos começar a aprender,<span className="text-violet-500">Daniel</span>
         </h2>

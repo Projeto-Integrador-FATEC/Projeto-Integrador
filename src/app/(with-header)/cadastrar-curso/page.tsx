@@ -4,11 +4,11 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowLeft, Upload, Image as ImageIcon } from "lucide-react";
-import Link from "next/link";
+import { Upload, Image as ImageIcon } from "lucide-react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { BackButton } from "@/components/ui/back-button";
 
 export default function CadastrarCursoPage() {
   const router = useRouter();
@@ -58,10 +58,8 @@ export default function CadastrarCursoPage() {
     <div className="min-h-screen bg-background dark:bg-zinc-900">
       <div className="max-w-4xl mx-auto px-4 py-8">
         {/* Cabeçalho */}
+        <BackButton className="mb-4" />
         <div className="flex items-center gap-4 mb-8">
-          <Link href="/" className="text-violet-500 hover:text-violet-600">
-            <ArrowLeft className="w-6 h-6" />
-          </Link>
           <h1 className="text-3xl font-bold text-zinc-900 dark:text-white">Cadastrar Novo Curso</h1>
         </div>
 

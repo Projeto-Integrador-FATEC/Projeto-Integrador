@@ -3,10 +3,12 @@ import { getCourseDetailsService } from "@/services/get-course-details-service";
 
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
+
   try {
-    const course = await getCourseDetailsService(Number(params.id));
+    const course = await getCourseDetailsService(Number(id));
     return NextResponse.json(course);
   } catch (error: any) {
     console.error("Erro ao buscar detalhes do curso:", error.response?.data);

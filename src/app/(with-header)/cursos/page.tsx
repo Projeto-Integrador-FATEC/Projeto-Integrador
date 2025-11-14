@@ -10,8 +10,11 @@ import { useEffect, useState } from "react";
 import { Course } from "@/services/get-courses-service";
 import { toast } from "sonner";
 import { BackButton } from "@/components/ui/back-button";
+import { useSession } from "next-auth/react";
 
 export default function CursosPage() {
+  const session = useSession();
+  const nome = session.data?.user?.name;
   const [courses, setCourses] = useState<Course[]>([]);
   const [filteredCourses, setFilteredCourses] = useState<Course[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -51,7 +54,7 @@ export default function CursosPage() {
         <BackButton className="mb-4" />
         
         <h2 className="text-3xl font-bold mb-6 text-zinc-900 dark:text-white">
-          Vamos começar a aprender,<span className="text-violet-500">Daniel</span>
+          Vamos começar a aprender,<span className="text-violet-500"> {nome}</span>
         </h2>
 
         {/* Barra de pesquisa */}

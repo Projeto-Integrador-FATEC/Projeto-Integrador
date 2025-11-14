@@ -19,7 +19,7 @@ export function SignIn() {
     const password = formData.get("password") as string
 
     try {
-      const response = await fetch("/api/auth/callback/credentials", {
+      const response = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
@@ -38,9 +38,9 @@ export function SignIn() {
         return
       }
 
-      // Redirect to home page on success
-      router.push("/")
-      router.refresh()
+      // Sucesso no login - forçar recarregamento completo para atualizar a sessão
+      toast.success("Login realizado com sucesso!")
+      window.location.href = "/"
     } catch (error) {
       toast.error("Erro ao fazer login", {
         description: "Email ou senha inválidos",

@@ -1,6 +1,5 @@
-import { signIn } from "../../../../../../auth"
+import { signIn } from "../../../../../auth"
 import { NextResponse } from "next/server"
-import LoginService from "@/services/get-user-service"
 
 export async function POST(request: Request) {
   try {
@@ -14,21 +13,19 @@ export async function POST(request: Request) {
       )
     }
 
-    const response = await LoginService(email, password)
-    
-    if (!response.data) {
+    // Usar o NextAuth signIn que já faz a validação com o backend
+    const result = await signIn("credentials", {
+      email,
+      password,
+      redirect: false,
+    })
+
+    if (result?.error) {
       return NextResponse.json(
         { error: "Credenciais inválidas" },
         { status: 401 }
       )
     }
-
-    // Set the session
-    await signIn("credentials", {
-      email,
-      password,
-      redirect: false,
-    })
 
     return NextResponse.json({ success: true })
   } catch (error: any) {
@@ -38,4 +35,4 @@ export async function POST(request: Request) {
       { status: 500 }
     )
   }
-} 
+}

@@ -3,7 +3,6 @@ import { createCommentsService } from "@/services/create-comments-service";
 
 export async function POST(request: NextRequest) {
   
-    console.log("Cheguei aquiii");
     try {
     const body = await request.json();
     const { texto, email, cursoId } = body;

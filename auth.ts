@@ -30,6 +30,18 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       // redireciona sempre para a dashboard
       return "/";
     },
+    async jwt({ token, user }) {
+      if (user) {
+        token.email = user.email;
+      }
+      return token;
+    },
+    async session({ session, token }) {
+      if (session.user) {
+        session.user.email = token.email as string;
+      }
+      return session;
+    },
   },
   pages: {
     signIn: "/login",

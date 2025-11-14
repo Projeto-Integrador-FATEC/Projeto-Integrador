@@ -12,9 +12,14 @@ import { RatingModal } from "@/components/rating-modal";
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Comment } from "@/services/get-course-comments";
+import { useSession } from "next-auth/react";
 
 export default function CursoDetailsPage() {
   const params = useParams();
+  const session = useSession();
+  const email = session.data?.user?.email;
+  
+
   const [course, setCourse] = useState<CourseDetails | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isRatingModalOpen, setIsRatingModalOpen] = useState(false);
@@ -70,7 +75,7 @@ export default function CursoDetailsPage() {
         method: "POST",
         body: JSON.stringify({
           texto: newComment,
-          email: "danielvigano17@gmail.com",
+          email: email,
           cursoId: params.id as string
         })
       });

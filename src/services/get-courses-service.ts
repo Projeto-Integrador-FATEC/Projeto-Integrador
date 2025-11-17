@@ -7,10 +7,13 @@ export interface Course {
   cargaHoraria: number;
   nivel: "iniciante" | "intermediario" | "avancado";
   imagemPath?: string;
+  categoria_id: number | null;
 }
 
 export async function getCoursesService(): Promise<Course[]> {
   const response = await api.get(`/api/cursos`);
+
+  console.log("response", response);
   
   if (!response.data) {
     throw new Error("Erro ao buscar cursos");

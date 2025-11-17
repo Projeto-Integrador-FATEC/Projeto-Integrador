@@ -9,24 +9,40 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { BackButton } from "@/components/ui/back-button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { getCategories } from "@/services/categories-service";
 
 export default function CadastrarCursoPage() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<string>("");
+  const categories = getCategories();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    
     setIsLoading(true);
 
     try {
       const formData = new FormData(e.currentTarget);
       
+      // Adiciona a categoria ao FormData se foi selecionada
+      if (selectedCategory && selectedCategory !== "none") {
+        formData.append("categoria_id", selectedCategory);
+      }
+      
       // Adiciona a imagem ao FormData se ela existir
       if (selectedImage) {
         formData.append("image", selectedImage);
       }
-
+      console.log("formData", formData);
       const response = await fetch("http://localhost:3000/api/courses", {
         method: "POST",
         body: formData,
@@ -121,6 +137,25 @@ export default function CadastrarCursoPage() {
                     <option value="avancado">Avançado</option>
                   </select>
                 </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">
+                  Categoria
+                </label>
+                <Select value={selectedCategory || undefined} onValueChange={(value) => setSelectedCategory(value === "none" ? "" : value)}>
+                  <SelectTrigger className="w-full shadow-md focus:ring-2 focus:ring-violet-400 bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-white">
+                    <SelectValue placeholder="Selecione a categoria (opcional)" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">Nenhuma categoria</SelectItem>
+                    {categories.map((category) => (
+                      <SelectItem key={category.id} value={category.id.toString()}>
+                        {category.nome}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
 
               <div>

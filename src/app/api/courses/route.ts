@@ -30,6 +30,14 @@ export async function POST(request: Request) {
 
     const formData = await request.formData();
     
+    const categoriaIdValue = formData.get("categoria_id") as string | null;
+    let categoriaId: number | null = null;
+    
+    if (categoriaIdValue && categoriaIdValue !== "") {
+      const parsed = Number.parseInt(categoriaIdValue, 10);
+      categoriaId = isNaN(parsed) ? null : parsed;
+    }
+    
     const courseData = {
       nome: formData.get("name") as string,
       descricao: formData.get("description") as string,
@@ -38,6 +46,7 @@ export async function POST(request: Request) {
       image: formData.get("image") as File,
       provider: formData.get("provider") as string,
       url: formData.get("url") as string,
+      categoria_id: categoriaId,
     };
 
     const validation = validateCreateCourse(courseData);

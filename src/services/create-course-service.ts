@@ -7,13 +7,15 @@ export interface CreateCourseData {
   nivel: "iniciante" | "intermediario" | "avancado";
   provider: string;
   url: string;
+  categoria_id?: number | null;
   image?: File;
 }
 
 export async function createCourseService(data: CreateCourseData) {
   const formData = new FormData();
   
-  console.log("data", data);
+  console.log("Dados do curso a ser criado", data);
+  
 
   // Enviar o JSON como Blob
   formData.append("curso", new Blob(

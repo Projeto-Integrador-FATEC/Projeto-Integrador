@@ -16,7 +16,7 @@ export const createCourseSchema = z.object({
   image: z.instanceof(File).optional(),
   provider: z.string().min(1, "O fornecedor do curso é obrigatório"),
   url: z.string().url("URL inválida").min(1, "A URL do curso é obrigatória"),
-  categoria_id: z.number().nullable().optional(),
+  categoria_id: z.number().nullable().default(0),
 });
 
 export type CreateCourseDTO = z.infer<typeof createCourseSchema>;

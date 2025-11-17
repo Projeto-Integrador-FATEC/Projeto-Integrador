@@ -14,9 +14,6 @@ export interface CreateCourseData {
 export async function createCourseService(data: CreateCourseData) {
   const formData = new FormData();
   
-  console.log("Dados do curso a ser criado", data);
-  
-
   // Enviar o JSON como Blob
   formData.append("curso", new Blob(
     [JSON.stringify(data)], { type: "application/json" }
@@ -24,6 +21,10 @@ export async function createCourseService(data: CreateCourseData) {
   
   if (data.image) {
     formData.append("imagem", data.image);
+  }
+
+  if (data.categoria_id) {
+    formData.append("categoria_id", new Blob([data.categoria_id.toString()], { type: "application/json" }));
   }
 
   const response = await api.post("/api/cursos", formData, {

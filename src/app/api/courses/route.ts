@@ -36,6 +36,8 @@ export async function POST(request: Request) {
     if (categoriaIdValue && categoriaIdValue !== "") {
       const parsed = Number.parseInt(categoriaIdValue, 10);
       categoriaId = isNaN(parsed) ? null : parsed;
+    }else{
+      categoriaId = 0;
     }
     
     const courseData = {

@@ -4,8 +4,16 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { ArrowLeft, Upload, Image as ImageIcon } from "lucide-react";
 import Link from "next/link";
+import { auth } from "../../../../auth";
+import { redirect } from "next/navigation";
 
-export default function CadastrarCursoPage() {
+export default async function CadastrarCursoPage() {
+  const session = await auth();
+
+  if (session?.user?.role !== "ADMIN") {
+    redirect("/");
+  }
+
   return (
     <div className="min-h-screen bg-background">
       <div className="max-w-4xl mx-auto px-4 py-8">

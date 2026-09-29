@@ -4,8 +4,11 @@ import Image from "next/image";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { motion } from "motion/react";
 import Link from "next/link";
+import { useSession } from "next-auth/react";
 
 export default function Home() {
+  const { data: session } = useSession();
+  const isAdmin = session?.user?.role === "ADMIN";
   return (
     <div className="mb-4">
       {/* Cards principais */}
@@ -38,19 +41,32 @@ export default function Home() {
           </Card>
         </motion.div>
         
-        <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.4 }} className="flex-1 max-w-sm">
-          <Card className="h-full">
-            <CardHeader>
-              <CardTitle>Cadastre seus próprios cursos</CardTitle>
-              <CardDescription>
-                Se você é uma ONG ou empresa e deseja fornecer cursos gratuitos, podemos ajudá-los !!
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="h-full flex items-end">
-              <Link href="/cadastrar-curso" className="text-violet-600 hover:underline">Cadastrar Curso</Link>
-            </CardContent>
-          </Card>
-        </motion.div>
+        {isAdmin && (
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+            className="flex-1 max-w-sm"
+          >
+            <Card className="h-full">
+              <CardHeader>
+                <CardTitle>Cadastre seus próprios cursos</CardTitle>
+                <CardDescription>
+                  Se você é uma ONG ou empresa e deseja fornecer cursos gratuitos, podemos ajudá-los !!
+                </CardDescription>
+              </CardHeader>
+
+              <CardContent className="h-full flex items-end">
+                <Link
+                  href="/cadastrar-curso"
+                  className="text-violet-600 hover:underline"
+                >
+                  Cadastrar Curso
+                </Link>
+              </CardContent>
+            </Card>
+          </motion.div>
+        )}
       </section>
 
       {/* Colaboradores */}

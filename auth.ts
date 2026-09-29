@@ -27,11 +27,26 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     }),
   ],
   callbacks: {
-    async redirect({ url, baseUrl }) {
-      // redireciona sempre para a dashboard
-      return "/";
-    },
+  async jwt({ token, user }) {
+    if (user) {
+      token.role = user.role
+    }
+
+    return token
   },
+
+  async session({ session, token }) {
+    if (session.user) {
+      session.user.role = token.role as string
+    }
+
+    return session
+  },
+
+  async redirect({ url, baseUrl }) {
+    return "/";
+  },
+},
   pages: {
     signIn: "/login",
   },

@@ -33,7 +33,7 @@ export default function DoacaoPage() {
   useEffect(() => {
     const fetchCourses = async () => {
       try {
-        const response = await fetch("/api/courses");
+        const response = await fetch("/api/cursos");
         if (!response.ok) {
           throw new Error("Erro ao carregar cursos");
         }

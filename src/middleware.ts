@@ -1,5 +1,8 @@
-import { auth } from "../auth"
- 
+import NextAuth from "next-auth"
+import { authConfig } from "../auth.config"
+
+const { auth } = NextAuth(authConfig)
+
 export default auth((req: any) => {
   // Se o usuário estiver logado e tentar acessar login ou cadastro, redireciona para home
   if (req.auth && (req.nextUrl.pathname === "/login" || req.nextUrl.pathname === "/cadastro")) {
@@ -17,6 +20,6 @@ export default auth((req: any) => {
 export const config = {
     matcher: [
         // Protege todas as rotas exceto as rotas do sistema
-        "/((?!api|_next/static|_next/image|favicon.ico|login_img.png|logo_img.svg).*)",
+        "/((?!api|imagens|_next/static|_next/image|favicon.ico|login_img.png|logo_img.svg).*)",
     ]
 }

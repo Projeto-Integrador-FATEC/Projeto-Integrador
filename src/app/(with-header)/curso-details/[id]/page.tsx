@@ -4,14 +4,14 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ThumbsUp, Clock, CalendarDays, FileText, MessageCircle, Send, Star } from "lucide-react";
 import { useEffect, useState } from "react";
-import { CourseDetails } from "@/services/get-course-details-service";
+import { CourseDetails } from "@/models/course.model";
 import { toast } from "sonner";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { RatingModal } from "@/components/rating-modal";
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Comment } from "@/services/get-course-comments";
+import { Comment } from "@/models/comment.model";
 import { useSession } from "next-auth/react";
 
 export default function CursoDetailsPage() {
@@ -30,9 +30,9 @@ export default function CursoDetailsPage() {
   useEffect(() => {
     async function loadCourseDetails() {
       try {
-        const response = await fetch(`/api/courses/${params.id}`);
+        const response = await fetch(`/api/cursos/${params.id}`);
 
-        const commentsResponse = await fetch(`/api/comments/${params.id}`);
+        const commentsResponse = await fetch(`/api/comentarios/curso/${params.id}`);
         if (!response.ok || !commentsResponse.ok) {
           throw new Error("Erro ao carregar detalhes do curso");
         }
@@ -71,11 +71,12 @@ export default function CursoDetailsPage() {
     setIsSubmittingComment(true);
     
     try {
-      const commentsResponse = await fetch(`/api/comments/cadastrar-comments`, {
+      const commentsResponse = await fetch(`/api/comentarios`, {
         method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           texto: newComment,
-          email: email,
+          emailUsuario: email,
           cursoId: params.id as string
         })
       });
@@ -88,7 +89,7 @@ export default function CursoDetailsPage() {
       console.log("Resposta do comentário:", commentResponse);
 
       // Recarregar os comentários para pegar a estrutura atualizada da API
-      const updatedCommentsResponse = await fetch(`/api/comments/${params.id}`);
+      const updatedCommentsResponse = await fetch(`/api/comentarios/curso/${params.id}`);
       if (updatedCommentsResponse.ok) {
         const updatedComments = await updatedCommentsResponse.json();
         setComments(updatedComments);

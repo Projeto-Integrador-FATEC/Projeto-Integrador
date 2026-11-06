@@ -1,0 +1,72 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id          Int          @id @default(autoincrement())
+  name        String
+  email       String       @unique
+  password    String
+  role        String       @default("ALUNO")
+  comentarios Comentario[]
+  avaliacoes  Avaliacao[]
+
+  @@map("users")
+}
+
+model Categoria {
+  id     Int     @id @default(autoincrement())
+  nome   String
+  cursos Curso[]
+
+  @@map("categorias")
+}
+
+model Curso {
+  id           Int          @id @default(autoincrement())
+  nome         String
+  descricao    String       @db.Text
+  cargaHoraria Int          @map("carga_horaria")
+  nivel        String
+  provider     String
+  url          String
+  imagemPath   String?      @map("imagem_path")
+  categoriaId  Int?         @map("categoria_id")
+  categoria    Categoria?   @relation(fields: [categoriaId], references: [id])
+  comentarios  Comentario[]
+  avaliacoes   Avaliacao[]
+
+  @@index([categoriaId])
+  @@map("cursos")
+}
+
+model Comentario {
+  id      Int      @id @default(autoincrement())
+  texto   String
+  date    DateTime @default(now())
+  userId  Int      @map("user_id")
+  cursoId Int      @map("curso_id")
+  user    User     @relation(fields: [userId], references: [id])
+  curso   Curso    @relation(fields: [cursoId], references: [id])
+
+  @@index([cursoId])
+  @@map("comentarios")
+}
+
+model Avaliacao {
+  id            Int      @id @default(autoincrement())
+  nota          Int
+  dataAvaliacao DateTime @default(now()) @map("data_avaliacao")
+  userId        Int      @map("user_id")
+  cursoId       Int      @map("curso_id")
+  user          User     @relation(fields: [userId], references: [id])
+  curso         Curso    @relation(fields: [cursoId], references: [id])
+
+  @@index([cursoId])
+  @@map("avaliacoes")
+}

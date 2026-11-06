@@ -1,8 +1,10 @@
-import LoginService from "@/services/get-user-service"
 import NextAuth from "next-auth"
 import Credentials from "next-auth/providers/credentials"
+import { modules } from "@/services/modules"
+import { authConfig } from "./auth.config"
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
+  ...authConfig,
   providers: [
     Credentials({
       credentials: {
@@ -11,50 +13,22 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       },
 
       authorize: async (credentials) => {
-        const response = await LoginService(
+        const user = await modules.services.user.authenticate(
           credentials.email as string,
           credentials.password as string
         )
 
-        const user = response.data
-
         if (!user) {
-          throw new Error("Invalid credentials.")
+          return null
         }
 
-        return user
+        return {
+          id: String(user.id),
+          name: user.name,
+          email: user.email,
+          role: user.role,
+        }
       },
     }),
   ],
-
-  callbacks: {
-    async jwt({ token, user }) {
-      if (user) {
-        token.email = user.email
-        token.role = user.role
-        token.accessToken = user.token
-      }
-
-      return token
-    },
-
-    async session({ session, token }) {
-      if (session.user) {
-        session.user.email = token.email as string
-        session.user.role = token.role as string
-      }
-
-      session.accessToken = token.accessToken as string
-
-      return session
-    },
-
-    async redirect({ baseUrl }) {
-      return baseUrl
-    },
-  },
-
-  pages: {
-    signIn: "/login",
-  },
 })

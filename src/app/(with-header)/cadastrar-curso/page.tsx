@@ -17,7 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { getCategories } from "@/services/categories-service";
+import { Category } from "@/models/category.model";
 
 export default function CadastrarCursoPage() {
   const router = useRouter();
@@ -27,8 +27,14 @@ export default function CadastrarCursoPage() {
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [imagemPreview, setImagemPreview] = useState<string | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string>("");
+  const [categories, setCategories] = useState<Category[]>([]);
 
-  const categories = getCategories();
+  useEffect(() => {
+    fetch("/api/categorias")
+      .then((response) => (response.ok ? response.json() : []))
+      .then(setCategories)
+      .catch(() => toast.error("Erro ao carregar categorias"));
+  }, []);
 
   useEffect(() => {
     if (status !== "loading" && session?.user?.role !== "ADMIN") {
@@ -86,16 +92,14 @@ export default function CadastrarCursoPage() {
         formData.append("imagem", selectedImage);
       }
 
-      const response = await fetch("http://localhost:4080/api/cursos", {
+      const response = await fetch("/api/cursos", {
         method: "POST",
-        headers: {
-          Authorization: `Bearer ${session.accessToken}`,
-        },
         body: formData,
       });
 
       if (!response.ok) {
-        throw new Error(`Erro ao cadastrar curso: ${response.status}`);
+        const data = await response.json().catch(() => null);
+        throw new Error(data?.error ?? `Erro ao cadastrar curso: ${response.status}`);
       }
 
       toast.success("Curso cadastrado com sucesso!");

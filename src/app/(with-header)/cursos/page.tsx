@@ -13,7 +13,8 @@ import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { Course } from "@/services/get-courses-service";
+import { Course } from "@/models/course.model";
+import { Category } from "@/models/category.model";
 import { toast } from "sonner";
 import { BackButton } from "@/components/ui/back-button";
 import { useSession } from "next-auth/react";
@@ -24,7 +25,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { getCategories } from "@/services/categories-service";
 
 export default function CursosPage() {
   const { data: session } = useSession();
@@ -36,22 +36,25 @@ export default function CursosPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-
-  const categories = getCategories();
+  const [categories, setCategories] = useState<Category[]>([]);
 
   useEffect(() => {
     async function loadCourses() {
       try {
-        const response = await fetch("/api/courses");
+        const [coursesResponse, categoriesResponse] = await Promise.all([
+          fetch("/api/cursos"),
+          fetch("/api/categorias"),
+        ]);
 
-        if (!response.ok) {
+        if (!coursesResponse.ok || !categoriesResponse.ok) {
           throw new Error("Erro ao carregar cursos");
         }
 
-        const data = await response.json();
+        const data = await coursesResponse.json();
 
         setCourses(data);
         setFilteredCourses(data);
+        setCategories(await categoriesResponse.json());
       } catch (error) {
         console.error(error);
         toast.error("Erro ao carregar cursos");
@@ -162,7 +165,7 @@ export default function CursosPage() {
                 <Image
                   src={
                     course.imagemPath
-                      ? `http://localhost:4080/imagens/${course.imagemPath}`
+                      ? `/imagens/${course.imagemPath}`
                       : "/img_curso.svg"
                   }
                   alt={course.nome}

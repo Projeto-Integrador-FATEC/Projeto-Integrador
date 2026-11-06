@@ -13,5 +13,5 @@ alwaysApply: true
 
 ## Estrutura
 
-- Todas interações com serviços externos devem ser feitos através de uma classe dentro da pasta services
+- Todas interações com serviços externos devem ser feitas através de um repository em `src/repositories`, consumido por uma classe service em `src/services` (ver `architecture-layers.mdc`)
 - Interações em páginas "use client" devem sempre usar api routes quando precisar interagir com algum service

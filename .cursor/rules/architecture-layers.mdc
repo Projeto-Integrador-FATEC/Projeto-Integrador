@@ -1,0 +1,44 @@
+---
+description: Garante a arquitetura em camadas model, repository (Prisma/Supabase) e service, com services implementando interfaces e centralizados em modules.ts
+alwaysApply: true
+---
+
+# Arquitetura em camadas
+
+Antes de criar ou alterar models, repositories, services, api routes, `auth.ts` ou qualquer chamada ao backend, leia e siga a skill `.cursor/skills/organizing-layers/SKILL.md`.
+
+## Regras obrigatórias
+
+- Tipos de entidade ficam só em `src/models/<entidade>.model.ts`.
+- Só `src/repositories/*.repository.ts` importa `@/lib/prisma` (banco) e `@/lib/supabase` (Storage); todo repository implementa uma interface em `src/repositories/interfaces`.
+- Repositories retornam models, nunca tipos do Prisma (`@/generated/prisma`); o mapeamento fica em `src/repositories/mappers.ts`.
+- Services lançam `HttpError` (`@/lib/http-error`) com mensagem em português; api routes respondem erros com `toErrorResponse`.
+- Rotas que exigem perfil usam `requireRole(request, "ADMIN")` de `@/lib/auth-guard`.
+- O middleware importa só `auth.config.ts` (edge); `auth.ts` é o único que usa `modules` no NextAuth.
+- Mudou o banco? Edite `prisma/schema.prisma` e rode `npx prisma migrate dev --name <nome>`.
+- Toda classe em `src/services` implementa uma interface em `src/services/interfaces` (`implements I<Entidade>Service`), com todos os métodos públicos declarados nela.
+- Services recebem repositories pelo construtor, tipados pela interface do repository.
+- `new` de repositories e services só existe em `src/services/modules.ts`; o objeto `modules` é tipado apenas por interfaces.
+- Api routes, server components e `auth.ts` usam `modules.services.<entidade>`.
+- Arquivos `"use client"` nunca importam `@/services` ou `@/repositories`; usam api routes.
+
+## Exemplo
+
+```ts
+// ❌ ERRADO: prisma fora do repository e service instanciado na rota
+import { prisma } from "@/lib/prisma";
+import { CourseService } from "@/services/course.service";
+
+const service = new CourseService(new CourseRepository());
+const courses = await prisma.curso.findMany();
+
+// ✅ CERTO
+import { modules } from "@/services/modules";
+
+const courses = await modules.services.course.getAll();
+```
+
+## Ao terminar uma alteração
+
+- Ao criar um service novo, registre-o no tipo `Modules` e no objeto `modules`.
+- Rode `npx tsc --noEmit` e corrija os erros.

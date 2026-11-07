@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useSession } from "next-auth/react";
+import { useSession } from "@/lib/auth-client";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -21,7 +21,7 @@ import { Category } from "@/models/category.model";
 
 export default function CadastrarCursoPage() {
   const router = useRouter();
-  const { data: session, status } = useSession();
+  const { data: session, isPending } = useSession();
 
   const [isLoading, setIsLoading] = useState(false);
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
@@ -37,10 +37,10 @@ export default function CadastrarCursoPage() {
   }, []);
 
   useEffect(() => {
-    if (status !== "loading" && session?.user?.role !== "ADMIN") {
+    if (!isPending && session?.user?.role !== "ADMIN") {
       router.replace("/");
     }
-  }, [status, session, router]);
+  }, [isPending, session, router]);
 
   useEffect(() => {
     return () => {
@@ -50,7 +50,7 @@ export default function CadastrarCursoPage() {
     };
   }, [imagemPreview]);
 
-  if (status === "loading") {
+  if (isPending) {
     return <p className="p-8">Carregando...</p>;
   }
 

@@ -2,8 +2,10 @@ import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { LogOut } from "lucide-react";
-import { signOut } from "../../auth";
+import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { modules } from "@/services/modules";
 
 export function Header() {
   return (
@@ -17,7 +19,8 @@ export function Header() {
           <ThemeToggle />
           <form action={async () => {
             "use server"
-            await signOut()
+            await modules.services.user.logout(await headers())
+            redirect("/login")
           }}>
             <Button 
               type="submit"

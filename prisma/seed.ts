@@ -116,13 +116,27 @@ async function uploadImage(fileName: string) {
 async function main() {
   await ensureBucket();
 
-  for (const user of users) {
-    const password = await bcrypt.hash(user.password, 10);
-    await prisma.user.upsert({
+  for (const { password, ...user } of users) {
+    const saved = await prisma.user.upsert({
       where: { email: user.email },
       update: {},
-      create: { ...user, password },
+      create: user,
     });
+
+    const credential = await prisma.account.findFirst({
+      where: { userId: saved.id, providerId: "credential" },
+    });
+
+    if (!credential) {
+      await prisma.account.create({
+        data: {
+          accountId: String(saved.id),
+          providerId: "credential",
+          userId: saved.id,
+          password: await bcrypt.hash(password, 10),
+        },
+      });
+    }
   }
 
   for (const category of categories) {

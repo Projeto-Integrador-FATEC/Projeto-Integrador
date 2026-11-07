@@ -1,11 +1,9 @@
 "use client"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { useRouter } from "next/navigation"
 import { useState } from "react"
 
 export function SignUp() {
-  const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
 
   const handleSubmit = async (formData: FormData) => {
@@ -36,7 +34,7 @@ export function SignUp() {
         throw new Error(data.error || "Erro ao criar usuário");
       }
 
-      router.push("/login")
+      window.location.href = "/"
     } catch (error: any) {
       console.error("Erro ao criar usuário:", error)
       alert(error.message || "Erro ao criar usuário. Tente novamente.")

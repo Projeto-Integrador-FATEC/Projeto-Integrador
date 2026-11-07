@@ -3,7 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "sonner";
 import { Providers } from "@/components/providers";
-import { SessionProvider } from "next-auth/react";
+
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
@@ -22,12 +22,10 @@ export default function RootLayout({
   return (
     <html lang="pt-BR" suppressHydrationWarning>
       <body className={inter.className}>
-        <SessionProvider>
-          <Providers>
-            <Toaster richColors />
-            {children}
-          </Providers>
-        </SessionProvider>
+        <Providers>
+          <Toaster richColors />
+          {children}
+        </Providers>
       </body>
     </html>
   );

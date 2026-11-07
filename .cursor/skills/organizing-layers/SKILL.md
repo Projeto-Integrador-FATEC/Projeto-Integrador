@@ -40,7 +40,7 @@ Um arquivo por entidade em cada camada (`course`, `user`, `comment`, `donation`,
 
 - **Modules** (`src/services/modules.ts`): único lugar onde se usa `new` em repositories e services. Cada repository é instanciado uma vez e compartilhado entre os services que dependem dele.
 
-Quem consome services: api routes (`src/app/api/**/route.ts`), server components e `auth.ts`, sempre via `modules` (`import { modules } from "@/services/modules"`). Nunca importar a classe do service diretamente para instanciar. Páginas `"use client"` nunca importam `modules`; chamam api routes (regra do projeto).
+Quem consome services: api routes (`src/app/api/**/route.ts`), server components e server actions, sempre via `modules` (`import { modules } from "@/services/modules"`). Nunca importar a classe do service diretamente para instanciar. Páginas `"use client"` nunca importam `modules`; chamam api routes (regra do projeto).
 
 ## Templates
 
@@ -225,7 +225,7 @@ export async function GET() {
 - [ ] 3. Criar a interface do service com todos os métodos públicos
 - [ ] 4. Criar a classe service com `implements I<Entidade>Service` (sem exportar instância)
 - [ ] 5. Registrar repository e service em src/services/modules.ts (tipo `Modules` + objeto)
-- [ ] 6. Atualizar api routes / auth.ts / server components para usar `modules.services.<entidade>`
+- [ ] 6. Atualizar api routes / server actions / server components para usar `modules.services.<entidade>`
 - [ ] 7. Remover funções antigas de src/services e tipos duplicados
 - [ ] 8. Rodar `npx tsc --noEmit` e corrigir erros
 ```

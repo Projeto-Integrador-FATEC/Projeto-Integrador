@@ -1,21 +1,24 @@
-import NextAuth from "next-auth"
-import { authConfig } from "../auth.config"
+import { NextRequest, NextResponse } from "next/server"
+import { getSessionCookie } from "better-auth/cookies"
 
-const { auth } = NextAuth(authConfig)
+const PUBLIC_PAGES = ["/login", "/cadastro"]
 
-export default auth((req: any) => {
+export default function middleware(req: NextRequest) {
+  const hasSession = Boolean(getSessionCookie(req))
+  const isPublicPage = PUBLIC_PAGES.includes(req.nextUrl.pathname)
+
   // Se o usuário estiver logado e tentar acessar login ou cadastro, redireciona para home
-  if (req.auth && (req.nextUrl.pathname === "/login" || req.nextUrl.pathname === "/cadastro")) {
-    const newUrl = new URL("/", req.nextUrl.origin)
-    return Response.redirect(newUrl)
+  if (hasSession && isPublicPage) {
+    return NextResponse.redirect(new URL("/", req.nextUrl.origin))
   }
 
   // Se o usuário não estiver logado e tentar acessar rotas protegidas, redireciona para login
-  if (!req.auth && req.nextUrl.pathname !== "/login" && req.nextUrl.pathname !== "/cadastro") {
-    const newUrl = new URL("/login", req.nextUrl.origin)
-    return Response.redirect(newUrl)
+  if (!hasSession && !isPublicPage) {
+    return NextResponse.redirect(new URL("/login", req.nextUrl.origin))
   }
-})
+
+  return NextResponse.next()
+}
 
 export const config = {
     matcher: [

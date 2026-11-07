@@ -5,21 +5,22 @@ alwaysApply: true
 
 # Arquitetura em camadas
 
-Antes de criar ou alterar models, repositories, services, api routes, `auth.ts` ou qualquer chamada ao backend, leia e siga a skill `.cursor/skills/organizing-layers/SKILL.md`.
+Antes de criar ou alterar models, repositories, services, api routes, `src/lib/auth.ts` ou qualquer acesso a dados, leia e siga a skill `.cursor/skills/organizing-layers/SKILL.md`.
 
 ## Regras obrigatórias
 
 - Tipos de entidade ficam só em `src/models/<entidade>.model.ts`.
-- Só `src/repositories/*.repository.ts` importa `@/lib/prisma` (banco) e `@/lib/supabase` (Storage); todo repository implementa uma interface em `src/repositories/interfaces`.
+- Só `src/repositories/*.repository.ts` importa `@/lib/prisma` (banco), `@/lib/supabase` (Storage) e `@/lib/auth` (Better Auth, via `auth.repository.ts`); todo repository implementa uma interface em `src/repositories/interfaces`. Exceções: `src/lib/auth.ts` usa `@/lib/prisma` no adapter, e `src/app/api/auth/[...all]/route.ts` monta o handler do Better Auth.
 - Repositories retornam models, nunca tipos do Prisma (`@/generated/prisma`); o mapeamento fica em `src/repositories/mappers.ts`.
 - Services lançam `HttpError` (`@/lib/http-error`) com mensagem em português; api routes respondem erros com `toErrorResponse`.
 - Rotas que exigem perfil usam `requireRole(request, "ADMIN")` de `@/lib/auth-guard`.
-- O middleware importa só `auth.config.ts` (edge); `auth.ts` é o único que usa `modules` no NextAuth.
+- Sessão no servidor: `modules.services.user.getSessionUser(headers)` (aceita cookie ou `Authorization: Bearer`). No cliente: `useSession`, `signIn`, `signOut` de `@/lib/auth-client`.
+- O middleware só checa a existência do cookie (`getSessionCookie`); a validação real acontece nas rotas.
 - Mudou o banco? Edite `prisma/schema.prisma` e rode `npx prisma migrate dev --name <nome>`.
 - Toda classe em `src/services` implementa uma interface em `src/services/interfaces` (`implements I<Entidade>Service`), com todos os métodos públicos declarados nela.
 - Services recebem repositories pelo construtor, tipados pela interface do repository.
 - `new` de repositories e services só existe em `src/services/modules.ts`; o objeto `modules` é tipado apenas por interfaces.
-- Api routes, server components e `auth.ts` usam `modules.services.<entidade>`.
+- Api routes, server components e server actions usam `modules.services.<entidade>`.
 - Arquivos `"use client"` nunca importam `@/services` ou `@/repositories`; usam api routes.
 
 ## Exemplo

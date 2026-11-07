@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button"
 import { toast } from "sonner"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
+import { signIn } from "@/lib/auth-client"
 
 export function SignIn() {
   const router = useRouter()
@@ -19,19 +20,9 @@ export function SignIn() {
     const password = formData.get("password") as string
 
     try {
-      const response = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      })
+      const { error } = await signIn.email({ email, password })
 
-      if (!response.ok) {
-        throw new Error("Credenciais inválidas")
-      }
-
-      const data = await response.json()
-
-      if (data.error) {
+      if (error) {
         toast.error("Erro ao fazer login", {
           description: "Email ou senha inválidos",
         })

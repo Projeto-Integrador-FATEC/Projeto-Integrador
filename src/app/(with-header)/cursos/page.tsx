@@ -17,7 +17,7 @@ import { Course } from "@/models/course.model";
 import { Category } from "@/models/category.model";
 import { toast } from "sonner";
 import { BackButton } from "@/components/ui/back-button";
-import { useSession } from "next-auth/react";
+import { useSession } from "@/lib/auth-client";
 import {
   Select,
   SelectContent,

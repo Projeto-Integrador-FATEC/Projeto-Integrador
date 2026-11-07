@@ -1,14 +1,14 @@
-import bcrypt from "bcryptjs";
 import { HttpError } from "@/lib/http-error";
-import { CreateUserData, User } from "@/models/user.model";
+import { CreateUserData, LoginResult, User } from "@/models/user.model";
+import { IAuthRepository } from "@/repositories/interfaces/auth-repository.interface";
 import { IUserRepository } from "@/repositories/interfaces/user-repository.interface";
 import { IUserService } from "./interfaces/user-service.interface";
 
-const DEFAULT_ROLE = "ALUNO";
-const SALT_ROUNDS = 10;
-
 export class UserService implements IUserService {
-  constructor(private readonly userRepository: IUserRepository) {}
+  constructor(
+    private readonly userRepository: IUserRepository,
+    private readonly authRepository: IAuthRepository
+  ) {}
 
   async getAll(): Promise<User[]> {
     return this.userRepository.findAll();
@@ -39,25 +39,22 @@ export class UserService implements IUserService {
       throw new HttpError("Todos os campos são obrigatórios", 400);
     }
 
-    const existing = await this.userRepository.findByEmail(data.email);
-
-    if (existing) {
-      throw new HttpError("E-mail já cadastrado", 409);
-    }
-
-    const password = await bcrypt.hash(data.password, SALT_ROUNDS);
-
-    return this.userRepository.create({ ...data, password, role: DEFAULT_ROLE });
+    return this.authRepository.signUp(data);
   }
 
-  async authenticate(email: string, password: string): Promise<User | null> {
-    const user = await this.userRepository.findByEmailWithPassword(email);
-
-    if (!user || !(await bcrypt.compare(password, user.password))) {
-      return null;
+  async login(email: string, password: string): Promise<LoginResult | null> {
+    if (!email || !password) {
+      throw new HttpError("Email e senha são obrigatórios", 400);
     }
 
-    const { password: _password, ...publicUser } = user;
-    return publicUser;
+    return this.authRepository.signIn(email, password);
+  }
+
+  async logout(headers: Headers): Promise<void> {
+    await this.authRepository.signOut(headers);
+  }
+
+  async getSessionUser(headers: Headers): Promise<User | null> {
+    return this.authRepository.getSessionUser(headers);
   }
 }

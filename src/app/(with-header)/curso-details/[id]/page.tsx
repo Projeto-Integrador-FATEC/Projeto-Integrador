@@ -12,7 +12,7 @@ import { RatingModal } from "@/components/rating-modal";
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Comment } from "@/models/comment.model";
-import { useSession } from "next-auth/react";
+import { useSession } from "@/lib/auth-client";
 
 export default function CursoDetailsPage() {
   const params = useParams();

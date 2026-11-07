@@ -10,7 +10,7 @@ Antes de criar ou alterar models, repositories, services, api routes, `src/lib/a
 ## Regras obrigatórias
 
 - Tipos de entidade ficam só em `src/models/<entidade>.model.ts`.
-- Só `src/repositories/*.repository.ts` importa `@/lib/prisma` (banco), `@/lib/supabase` (Storage) e `@/lib/auth` (Better Auth, via `auth.repository.ts`); todo repository implementa uma interface em `src/repositories/interfaces`. Exceções: `src/lib/auth.ts` usa `@/lib/prisma` no adapter, e `src/app/api/auth/[...all]/route.ts` monta o handler do Better Auth.
+- Só `src/repositories/*.repository.ts` importa `@/lib/prisma` (banco), `@/lib/supabase` (Storage), `@/lib/resend` (e-mail) e `@/lib/auth` (Better Auth, via `auth.repository.ts`); todo repository implementa uma interface em `src/repositories/interfaces`. Exceções: `src/lib/auth.ts` usa `@/lib/prisma` no adapter, e `src/app/api/auth/[...all]/route.ts` monta o handler do Better Auth.
 - Repositories retornam models, nunca tipos do Prisma (`@/generated/prisma`); o mapeamento fica em `src/repositories/mappers.ts`.
 - Services lançam `HttpError` (`@/lib/http-error`) com mensagem em português; api routes respondem erros com `toErrorResponse`.
 - Rotas que exigem perfil usam `requireRole(request, "ADMIN")` de `@/lib/auth-guard`.

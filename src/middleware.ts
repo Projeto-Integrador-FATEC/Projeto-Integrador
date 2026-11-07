@@ -2,8 +2,13 @@ import { NextRequest, NextResponse } from "next/server"
 import { getSessionCookie } from "better-auth/cookies"
 
 const PUBLIC_PAGES = ["/login", "/cadastro"]
+const OPEN_PAGES = ["/email-verificado"]
 
 export default function middleware(req: NextRequest) {
+  if (OPEN_PAGES.includes(req.nextUrl.pathname)) {
+    return NextResponse.next()
+  }
+
   const hasSession = Boolean(getSessionCookie(req))
   const isPublicPage = PUBLIC_PAGES.includes(req.nextUrl.pathname)
 

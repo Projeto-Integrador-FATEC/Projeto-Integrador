@@ -23,6 +23,16 @@ export const auth = betterAuth({
       verify: ({ password, hash }) => bcrypt.compare(password, hash),
     },
   },
+  emailVerification: {
+    sendOnSignUp: true,
+    autoSignInAfterVerification: true,
+    sendVerificationEmail: async ({ user, url }) => {
+      // Import dinâmico: modules -> auth.repository -> auth criaria import circular.
+      void import("@/services/modules")
+        .then(({ modules }) => modules.services.email.sendVerificationEmail(user, url))
+        .catch((error) => console.error("Erro ao enviar e-mail de verificação:", error));
+    },
+  },
   user: {
     additionalFields: {
       role: {

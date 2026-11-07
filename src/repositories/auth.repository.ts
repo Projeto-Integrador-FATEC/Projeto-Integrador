@@ -13,6 +13,8 @@ const ERROR_MESSAGES: Record<string, string> = {
   INVALID_EMAIL_OR_PASSWORD: "Credenciais inválidas",
 };
 
+const EMAIL_VERIFIED_CALLBACK_URL = "/email-verificado";
+
 type AuthUser = { id: string | number; name: string; email: string; role?: string | null };
 
 function toUser(user: AuthUser): User {
@@ -36,7 +38,9 @@ function toHttpError(error: unknown): unknown {
 export class AuthRepository implements IAuthRepository {
   async signUp(data: CreateUserData): Promise<User> {
     try {
-      const result = await auth.api.signUpEmail({ body: data });
+      const result = await auth.api.signUpEmail({
+        body: { ...data, callbackURL: EMAIL_VERIFIED_CALLBACK_URL },
+      });
       return toUser(result.user);
     } catch (error) {
       throw toHttpError(error);

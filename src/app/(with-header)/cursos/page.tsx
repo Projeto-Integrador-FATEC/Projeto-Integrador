@@ -13,6 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { filterCourses } from "@/lib/course-catalog";
 import { Course } from "@/models/course.model";
 import { Category } from "@/models/category.model";
 import { toast } from "sonner";
@@ -67,17 +68,7 @@ export default function CursosPage() {
   }, []);
 
   useEffect(() => {
-    let filtered = courses.filter((course) =>
-      course.nome.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-
-    if (selectedCategory !== null) {
-      filtered = filtered.filter(
-        (course) => course.categoria_id === selectedCategory
-      );
-    }
-
-    setFilteredCourses(filtered);
+    setFilteredCourses(filterCourses(courses, searchTerm, selectedCategory));
   }, [searchTerm, selectedCategory, courses]);
 
   return (

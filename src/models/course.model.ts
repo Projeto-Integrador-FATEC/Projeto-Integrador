@@ -41,3 +41,22 @@ export interface CourseImage {
   body: ArrayBuffer;
   contentType: string;
 }
+
+export interface CourseSearchQuery {
+  termo?: string;
+  nivel?: string;
+  categoria?: string;
+  limite?: number;
+}
+
+export interface CourseSearchFilters {
+  termo?: string;
+  nivel?: string;
+  categoriaId?: number;
+  limite: number;
+}
+
+export interface CourseSearchResult {
+  total: number;
+  courses: Course[];
+}

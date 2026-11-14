@@ -1,3 +1,4 @@
+import { CourseChat } from "@/components/course-chat";
 import { Header } from "@/components/header";
 
 export default function WithHeaderLayout({
@@ -13,6 +14,7 @@ export default function WithHeaderLayout({
       <main className="flex-1 mt-[105px]">
         {children}
       </main>
+      <CourseChat />
     </div>
   );
 } 

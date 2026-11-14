@@ -8,7 +8,7 @@ interface RatingModalProps {
   isOpen: boolean;
   onClose: () => void;
   courseId: string;
-  onRatingSubmit: (rating: number) => void;
+  onRatingSubmit: (rating: number) => void | Promise<void>;
 }
 
 export function RatingModal({ isOpen, onClose, courseId, onRatingSubmit }: RatingModalProps) {
@@ -22,16 +22,36 @@ export function RatingModal({ isOpen, onClose, courseId, onRatingSubmit }: Ratin
       return;
     }
 
+    const email = session.data?.user?.email;
+
+    if (!email) {
+      toast.error("Faça login para avaliar o curso");
+      return;
+    }
+
     setIsSubmitting(true);
     try {
-      // Simulando um delay para parecer uma requisição real
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const response = await fetch("/api/avaliacoes", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          nota: rating,
+          email,
+          cursoId: Number(courseId),
+        }),
+      });
+
+      if (!response.ok) {
+        const data = await response.json().catch(() => null);
+        throw new Error(data?.error ?? "Erro ao enviar avaliação");
+      }
 
       toast.success("Avaliação enviada com sucesso!");
-      onRatingSubmit(rating);
+      await onRatingSubmit(rating);
+      setRating(0);
       onClose();
     } catch (error) {
-      toast.error("Erro ao enviar avaliação");
+      toast.error(error instanceof Error ? error.message : "Erro ao enviar avaliação");
     } finally {
       setIsSubmitting(false);
     }

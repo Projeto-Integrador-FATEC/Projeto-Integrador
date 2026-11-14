@@ -37,10 +37,11 @@ export default function CursoDetailsPage() {
           throw new Error("Erro ao carregar detalhes do curso");
         }
         const data = await response.json();
-        setCourse(data);
+        const averageResponse = await fetch(`/api/avaliacoes/curso/${params.id}/media`);
+        const average = averageResponse.ok ? await averageResponse.json() : 0;
+        setCourse({ ...data, avaliacao: Number(average) || 0 });
         
         const comments = await commentsResponse.json();
-        console.log("comments recebidos:", comments);
         setComments(comments);
 
       } catch (error) {
@@ -53,13 +54,15 @@ export default function CursoDetailsPage() {
     loadCourseDetails();
   }, [params.id]);
 
-  const handleRatingSubmit = (newRating: number) => {
-    if (course) {
-      setCourse({
-        ...course,
-        avaliacao: newRating
-      });
+  const handleRatingSubmit = async () => {
+    const averageResponse = await fetch(`/api/avaliacoes/curso/${params.id}/media`);
+    if (!averageResponse.ok) {
+      toast.error("Avaliação salva, mas não foi possível atualizar a média");
+      return;
     }
+
+    const average = await averageResponse.json();
+    setCourse((current) => (current ? { ...current, avaliacao: Number(average) || 0 } : current));
   };
 
   const handleCommentSubmit = async () => {
@@ -123,7 +126,10 @@ export default function CursoDetailsPage() {
 
           <Card className="absolute md:static right-8 top-8 md:ml-8 w-[320px] shadow-lg p-6 flex flex-col gap-2 bg-white dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700">
             <div className="flex items-center gap-2 text-zinc-700 dark:text-zinc-300">
-              <ThumbsUp className="w-5 h-5" /> Avaliação <span className="ml-auto font-semibold">{course.avaliacao || 10}</span>
+              <ThumbsUp className="w-5 h-5" /> Avaliação{" "}
+              <span className="ml-auto font-semibold">
+                {course.avaliacao ? course.avaliacao.toFixed(1) : "—"}
+              </span>
             </div>
             <div className="flex items-center gap-2 text-zinc-700 dark:text-zinc-300">
               <Clock className="w-5 h-5" /> Carga Horária <span className="ml-auto font-semibold">{course.cargaHoraria}h</span>

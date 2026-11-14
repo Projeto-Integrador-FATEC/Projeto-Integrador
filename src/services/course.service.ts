@@ -1,11 +1,13 @@
 import { HttpError } from "@/lib/http-error";
-import { Course, CourseImage, CreateCourseData } from "@/models/course.model";
+import { Course, CourseImage, CourseSearchQuery, CourseSearchResult, CreateCourseData } from "@/models/course.model";
 import { ICategoryRepository } from "@/repositories/interfaces/category-repository.interface";
 import { ICourseRepository } from "@/repositories/interfaces/course-repository.interface";
 import { IStorageRepository } from "@/repositories/interfaces/storage-repository.interface";
 import { ICourseService } from "./interfaces/course-service.interface";
 
 const MAX_IMAGE_SIZE = 10 * 1024 * 1024;
+const COURSE_LEVELS = ["iniciante", "intermediario", "avancado"] as const;
+const DEFAULT_SEARCH_LIMIT = 10;
 
 export class CourseService implements ICourseService {
   constructor(
@@ -26,6 +28,40 @@ export class CourseService implements ICourseService {
     }
 
     return course;
+  }
+
+  async search(query: CourseSearchQuery): Promise<CourseSearchResult> {
+    const limite = query.limite ?? DEFAULT_SEARCH_LIMIT;
+
+    if (!Number.isInteger(limite) || limite < 1 || limite > DEFAULT_SEARCH_LIMIT) {
+      throw new HttpError("O limite da busca deve ficar entre 1 e 10", 400);
+    }
+
+    const termo = query.termo?.trim();
+
+    if (termo && termo.length > 100) {
+      throw new HttpError("O termo de busca deve ter no máximo 100 caracteres", 400);
+    }
+
+    let nivel: string | undefined;
+
+    if (query.nivel?.trim()) {
+      nivel = fold(query.nivel);
+
+      if (!COURSE_LEVELS.includes(nivel as (typeof COURSE_LEVELS)[number])) {
+        throw new HttpError("Nível inválido", 400);
+      }
+    }
+
+    const categoria = query.categoria?.trim();
+    const categoriaId = categoria ? await this.resolveCategoryId(categoria) : undefined;
+
+    return this.courseRepository.search({
+      termo: termo || undefined,
+      nivel,
+      categoriaId,
+      limite,
+    });
   }
 
   async create(data: CreateCourseData): Promise<Course> {
@@ -60,6 +96,23 @@ export class CourseService implements ICourseService {
     return image;
   }
 
+  private async resolveCategoryId(nome: string): Promise<number> {
+    const alvo = fold(nome);
+    const categories = await this.categoryRepository.findAll();
+    const exact = categories.filter((category) => fold(category.nome) === alvo);
+    const matches = exact.length > 0 ? exact : categories.filter((category) => fold(category.nome).includes(alvo));
+
+    if (matches.length === 0) {
+      throw new HttpError("Categoria não encontrada", 404);
+    }
+
+    if (matches.length > 1) {
+      throw new HttpError(`Há mais de uma categoria parecida: ${matches.map((category) => category.nome).join(", ")}`, 400);
+    }
+
+    return matches[0].id;
+  }
+
   private sanitizeFileName(name: string): string {
     return name
       .normalize("NFD")
@@ -68,4 +121,8 @@ export class CourseService implements ICourseService {
       .replace(/-+/g, "-")
       .toLowerCase();
   }
+}
+
+function fold(value: string): string {
+  return value.normalize("NFD").replace(/\p{M}/gu, "").toLowerCase();
 }

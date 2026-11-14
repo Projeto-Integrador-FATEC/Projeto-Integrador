@@ -29,7 +29,6 @@ export default async function EmailVerifiedPage({ searchParams }: EmailVerifiedP
     <div className="min-h-screen flex items-center justify-center bg-cyan-100 dark:bg-zinc-900 px-4">
       <Card className="w-full max-w-md text-center">
         <CardHeader className="flex flex-col items-center gap-3">
-          <Image src="/logo_img.svg" alt="Study Lovers" width={60} height={60} className="object-contain" />
           {success ? (
             <CircleCheck className="size-12 text-green-500" />
           ) : (

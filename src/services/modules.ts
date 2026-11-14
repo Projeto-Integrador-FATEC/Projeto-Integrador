@@ -34,6 +34,7 @@ const chatRepository = new ChatRepository();
 
 const categoryService = new CategoryService(categoryRepository, courseRepository);
 const courseService = new CourseService(courseRepository, categoryRepository, storageRepository);
+const ratingService = new RatingService(ratingRepository, courseRepository, userRepository);
 
 interface Modules {
   services: {
@@ -53,8 +54,8 @@ export const modules: Modules = {
     category: categoryService,
     course: courseService,
     comment: new CommentService(commentRepository, courseRepository, userRepository),
-    rating: new RatingService(ratingRepository, courseRepository, userRepository),
+    rating: ratingService,
     email: new EmailService(emailRepository),
-    chat: new ChatService(chatRepository, courseService, categoryService),
+    chat: new ChatService(chatRepository, courseService, categoryService, ratingService),
   },
 };

@@ -34,8 +34,7 @@ export function SignUp() {
         throw new Error(data.error || "Erro ao criar usuário");
       }
 
-      alert(`Conta criada! Enviamos um link de confirmação para ${email}.`)
-      window.location.href = "/"
+      window.location.href = `/verifique-seu-email?email=${encodeURIComponent(email)}`
     } catch (error: any) {
       console.error("Erro ao criar usuário:", error)
       alert(error.message || "Erro ao criar usuário. Tente novamente.")

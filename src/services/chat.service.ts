@@ -6,17 +6,19 @@ import { IChatRepository } from "@/repositories/interfaces/chat-repository.inter
 import { ICategoryService } from "./interfaces/category-service.interface";
 import { IChatService } from "./interfaces/chat-service.interface";
 import { ICourseService } from "./interfaces/course-service.interface";
+import { IRatingService } from "./interfaces/rating-service.interface";
 
 const MAX_TOOL_ROUNDS = 4;
 
 const SYSTEM_PROMPT = [
   "Você é o assistente da Study Lovers, uma plataforma de cursos gratuitos.",
   "Responda em português, de forma curta e direta.",
-  "Antes de afirmar que um curso existe, quantos existem ou qual é o conteúdo, chame uma ferramenta.",
+  "Antes de afirmar que um curso existe, quantos existem, qual é o conteúdo ou como ele foi avaliado, chame uma ferramenta.",
   "O campo total de buscarCursos é a quantidade que combina com o filtro. A lista pode vir incompleta por causa do limite.",
+  "Use verAvaliacoes para média, quantidade de notas e as notas de um curso. A escala é de 1 a 10. Se total for 0, diga que o curso ainda não foi avaliado.",
   "Se a busca não encontrar nada, diga que não há curso correspondente.",
   "Ao citar um curso, inclua o caminho do campo pagina para a pessoa abrir os detalhes.",
-  "Não invente cursos, cargas horárias, níveis, categorias ou links.",
+  "Não invente cursos, cargas horárias, níveis, categorias, notas, médias ou links.",
 ].join(" ");
 
 const TOOLS: ToolDefinition[] = [
@@ -66,6 +68,18 @@ const TOOLS: ToolDefinition[] = [
       properties: {},
     },
   },
+  {
+    name: "verAvaliacoes",
+    description:
+      "Consulta a média, a quantidade de avaliações e as notas de um curso. Use para perguntas sobre qualidade, nota, melhor curso ou se vale a pena. A escala é de 1 a 10.",
+    parameters: {
+      type: "object",
+      properties: {
+        id: { type: "integer", description: "Id do curso retornado por buscarCursos ou verCurso." },
+      },
+      required: ["id"],
+    },
+  },
 ];
 
 const searchArgsSchema = z.object({
@@ -84,6 +98,7 @@ export class ChatService implements IChatService {
     private readonly chatRepository: IChatRepository,
     private readonly courseService: ICourseService,
     private readonly categoryService: ICategoryService,
+    private readonly ratingService: IRatingService,
   ) {}
 
   async reply(messages: ChatTurn[]): Promise<string> {
@@ -153,6 +168,8 @@ export class ChatService implements IChatService {
           return JSON.stringify(await this.readCourse(args));
         case "listarCategorias":
           return JSON.stringify(await this.listCategories());
+        case "verAvaliacoes":
+          return JSON.stringify(await this.readRatings(args));
         default:
           return JSON.stringify({ erro: "Ferramenta desconhecida" });
       }
@@ -189,6 +206,25 @@ export class ChatService implements IChatService {
   private async listCategories() {
     const categories = await this.categoryService.getAll();
     return categories.map((category) => ({ id: category.id, nome: category.nome }));
+  }
+
+  private async readRatings(args: unknown) {
+    const parsed = courseArgsSchema.parse(args);
+    const course = await this.courseService.getById(parsed.id);
+    const [media, ratings] = await Promise.all([
+      this.ratingService.getAverageByCourseId(course.id),
+      this.ratingService.getByCourseId(course.id),
+    ]);
+
+    return {
+      id: course.id,
+      nome: course.nome,
+      pagina: `/curso-details/${course.id}`,
+      escala: "1 a 10",
+      media: ratings.length > 0 ? Number(media.toFixed(1)) : null,
+      total: ratings.length,
+      notas: ratings.map((rating) => rating.nota),
+    };
   }
 }
 

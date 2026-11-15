@@ -25,7 +25,7 @@ export default function Home() {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.1 }}
-          className="flex-1 max-w-sm"
+          className="flex-1 w-full"
         >
           <Card className="h-full justify-between bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-blue-950 dark:to-indigo-900 border-blue-200 dark:border-blue-700 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 group cursor-pointer">
             <CardHeader className="pb-4">
@@ -70,7 +70,7 @@ export default function Home() {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
-          className="flex-1 max-w-sm"
+          className="flex-1 w-full"
         >
           <Card className="h-full justify-between bg-gradient-to-br from-emerald-50 to-green-100 dark:from-emerald-950 dark:to-green-900 border-emerald-200 dark:border-emerald-700 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 group cursor-pointer">
             <CardHeader className="pb-4">
@@ -115,7 +115,7 @@ export default function Home() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.4 }}
-            className="flex-1 max-w-sm"
+            className="flex-1 w-full"
           >
             <Card className="h-full justify-between bg-gradient-to-br from-purple-50 to-violet-100 dark:from-purple-950 dark:to-violet-900 border-purple-200 dark:border-purple-700 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 group cursor-pointer">
               <CardHeader className="pb-4">

@@ -8,7 +8,9 @@ describe("CategoryService", () => {
     findAll: vi.fn(),
     findById: vi.fn(),
     findByCategoryId: vi.fn(),
+    search: vi.fn(),
     create: vi.fn(),
+    delete: vi.fn(),
   };
   const service = new CategoryService(categoryRepository, courseRepository);
 

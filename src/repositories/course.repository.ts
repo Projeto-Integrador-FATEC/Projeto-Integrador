@@ -90,10 +90,17 @@ export class CourseRepository implements ICourseRepository {
         url: data.url,
         imagemPath: data.imagemPath ?? null,
         categoriaId: data.categoria_id ?? null,
+        responsaveis: {
+          create: data.responsavelIds.map((userId) => ({ userId })),
+        },
       },
       include: courseInclude,
     });
     return toCourse(row);
+  }
+
+  async delete(id: number): Promise<void> {
+    await prisma.curso.delete({ where: { id } });
   }
 }
 

@@ -13,12 +13,14 @@ import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Comment } from "@/models/comment.model";
 import { useSession } from "@/lib/auth-client";
+import { DeleteCourseDialog } from "@/components/delete-course-dialog";
 
 export default function CursoDetailsPage() {
   const params = useParams();
   const session = useSession();
   const email = session.data?.user?.email;
-  
+  const userId = session.data?.user?.id ? Number(session.data.user.id) : null;
+
 
   const [course, setCourse] = useState<CourseDetails | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -115,6 +117,11 @@ export default function CursoDetailsPage() {
     return <div className="text-zinc-600 dark:text-zinc-400">Curso não encontrado</div>;
   }
 
+  const canDeleteCourse =
+    session.data?.user?.role === "ADMIN" &&
+    userId !== null &&
+    (course.responsavelIds ?? []).includes(userId);
+
   return (
     <div className="min-h-screen bg-background dark:bg-zinc-900 flex flex-col mb-8">
       {/* Banner do curso */}
@@ -155,9 +162,12 @@ export default function CursoDetailsPage() {
             Adicionar avaliação
           </Button>
         </div>
-        <Button className="bg-violet-500 hover:bg-violet-600 text-white font-semibold shadow-md">
-          <Link href="/doacao">Realizar Doação</Link>
-        </Button>
+        <div className="flex items-center gap-4">
+          {canDeleteCourse && <DeleteCourseDialog courseId={course.id} courseName={course.nome} />}
+          <Button className="bg-violet-500 hover:bg-violet-600 text-white font-semibold shadow-md">
+            <Link href="/doacao">Realizar Doação</Link>
+          </Button>
+        </div>
       </div>
 
       {/* Informações do curso */}

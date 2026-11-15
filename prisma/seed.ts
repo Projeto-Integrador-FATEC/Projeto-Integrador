@@ -145,13 +145,20 @@ async function main() {
 
   await prisma.$executeRaw`SELECT setval(pg_get_serial_sequence('categorias', 'id'), (SELECT MAX(id) FROM categorias))`;
 
+  const admins = await prisma.user.findMany({ where: { role: "ADMIN" }, select: { id: true } });
+
   for (const course of courses) {
     await uploadImage(course.imagemPath);
 
     const existing = await prisma.curso.findFirst({ where: { nome: course.nome } });
+    const saved = existing ?? (await prisma.curso.create({ data: course }));
 
-    if (!existing) {
-      await prisma.curso.create({ data: course });
+    for (const admin of admins) {
+      await prisma.cursoResponsavel.upsert({
+        where: { userId_cursoId: { userId: admin.id, cursoId: saved.id } },
+        update: {},
+        create: { userId: admin.id, cursoId: saved.id },
+      });
     }
   }
 

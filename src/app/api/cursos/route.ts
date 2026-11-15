@@ -23,7 +23,7 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
-    await requireRole(request, "ADMIN");
+    const user = await requireRole(request, "ADMIN");
 
     const formData = await request.formData();
     const cursoPart = await readPart(formData.get("curso"));
@@ -51,10 +51,13 @@ export async function POST(request: Request) {
 
     const imagem = formData.get("imagem");
 
-    const course = await modules.services.course.create({
-      ...validation.data,
-      image: imagem instanceof File ? imagem : null,
-    });
+    const course = await modules.services.course.create(
+      {
+        ...validation.data,
+        image: imagem instanceof File ? imagem : null,
+      },
+      user.id
+    );
 
     return NextResponse.json(course);
   } catch (error) {

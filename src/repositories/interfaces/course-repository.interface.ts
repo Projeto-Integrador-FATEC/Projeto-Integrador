@@ -6,4 +6,5 @@ export interface ICourseRepository {
   findByCategoryId(categoryId: number): Promise<Course[]>;
   search(filters: CourseSearchFilters): Promise<CourseSearchResult>;
   create(data: SaveCourseData): Promise<Course>;
+  delete(id: number): Promise<void>;
 }

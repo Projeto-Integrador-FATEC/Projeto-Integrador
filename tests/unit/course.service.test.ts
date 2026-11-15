@@ -1,6 +1,6 @@
 import { CourseService } from "@/services/course.service";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { cursoTecnologia, tecnologia } from "../support/fixtures";
+import { admin, outroAdmin, cursoTecnologia, tecnologia } from "../support/fixtures";
 
 const baseData = {
   nome: "Novo curso",
@@ -17,7 +17,9 @@ describe("CourseService", () => {
     findAll: vi.fn(),
     findById: vi.fn(),
     findByCategoryId: vi.fn(),
+    search: vi.fn(),
     create: vi.fn(),
+    delete: vi.fn(),
   };
   const categoryRepository = {
     findAll: vi.fn(),
@@ -26,13 +28,21 @@ describe("CourseService", () => {
   const storageRepository = {
     upload: vi.fn(),
     download: vi.fn(),
+    remove: vi.fn(),
   };
   const service = new CourseService(courseRepository, categoryRepository, storageRepository);
 
   beforeEach(() => {
     vi.clearAllMocks();
     categoryRepository.findById.mockResolvedValue(tecnologia);
-    courseRepository.create.mockImplementation(async (data) => ({ ...cursoTecnologia, ...data, id: 20 }));
+    courseRepository.create.mockImplementation(async (data) => ({
+      ...cursoTecnologia,
+      ...data,
+      id: 20,
+      responsavelIds: data.responsavelIds,
+    }));
+    courseRepository.delete.mockResolvedValue(undefined);
+    storageRepository.remove.mockResolvedValue(undefined);
     storageRepository.upload.mockResolvedValue(undefined);
   });
 
@@ -50,19 +60,21 @@ describe("CourseService", () => {
 
   it("rejeita categoria inexistente", async () => {
     categoryRepository.findById.mockResolvedValue(null);
-    await expect(service.create(baseData)).rejects.toMatchObject({ status: 400, message: "Categoria não encontrada" });
+    await expect(service.create(baseData, admin.id)).rejects.toMatchObject({ status: 400, message: "Categoria não encontrada" });
   });
 
   it("cadastra curso sem imagem e sem categoria", async () => {
-    await service.create({ ...baseData, categoria_id: null });
+    await service.create({ ...baseData, categoria_id: null }, admin.id);
     expect(categoryRepository.findById).not.toHaveBeenCalled();
     expect(storageRepository.upload).not.toHaveBeenCalled();
-    expect(courseRepository.create).toHaveBeenCalledWith(expect.objectContaining({ categoria_id: null, imagemPath: null }));
+    expect(courseRepository.create).toHaveBeenCalledWith(
+      expect.objectContaining({ categoria_id: null, imagemPath: null, responsavelIds: [admin.id] })
+    );
   });
 
   it("envia a capa com o nome sanitizado", async () => {
     const image = new File([new Uint8Array([1, 2, 3])], "Capa Ação Final.PNG", { type: "image/png" });
-    await service.create({ ...baseData, image });
+    await service.create({ ...baseData, image }, admin.id);
     expect(storageRepository.upload).toHaveBeenCalledTimes(1);
     const [path, file] = storageRepository.upload.mock.calls[0];
     expect(path).toMatch(/^\d+_capa-acao-final\.png$/);
@@ -73,13 +85,13 @@ describe("CourseService", () => {
   it("rejeita imagem maior que 10MB", async () => {
     const image = new File([new Uint8Array([1])], "grande.png", { type: "image/png" });
     Object.defineProperty(image, "size", { value: 10 * 1024 * 1024 + 1 });
-    await expect(service.create({ ...baseData, image })).rejects.toMatchObject({ status: 400 });
+    await expect(service.create({ ...baseData, image }, admin.id)).rejects.toMatchObject({ status: 400 });
     expect(storageRepository.upload).not.toHaveBeenCalled();
   });
 
   it("ignora arquivo vazio", async () => {
     const image = new File([], "vazio.png", { type: "image/png" });
-    await service.create({ ...baseData, image });
+    await service.create({ ...baseData, image }, admin.id);
     expect(storageRepository.upload).not.toHaveBeenCalled();
   });
 
@@ -92,5 +104,26 @@ describe("CourseService", () => {
   it("retorna 404 quando a imagem não existe", async () => {
     storageRepository.download.mockResolvedValue(null);
     await expect(service.getImage("ausente.png")).rejects.toMatchObject({ status: 404, message: "Imagem não encontrada" });
+  });
+
+  it("exclui o curso quando o admin é responsável", async () => {
+    courseRepository.findById.mockResolvedValue({ ...cursoTecnologia, imagemPath: "capa.png" });
+    await service.delete(cursoTecnologia.id, admin.id);
+    expect(storageRepository.remove).toHaveBeenCalledWith("capa.png");
+    expect(courseRepository.delete).toHaveBeenCalledWith(cursoTecnologia.id);
+  });
+
+  it("impede a exclusão por admin que não é responsável", async () => {
+    courseRepository.findById.mockResolvedValue(cursoTecnologia);
+    await expect(service.delete(cursoTecnologia.id, outroAdmin.id)).rejects.toMatchObject({
+      status: 403,
+      message: "Somente os administradores responsáveis pelo curso podem excluí-lo",
+    });
+    expect(courseRepository.delete).not.toHaveBeenCalled();
+  });
+
+  it("retorna 404 ao excluir curso inexistente", async () => {
+    courseRepository.findById.mockResolvedValue(null);
+    await expect(service.delete(9999, admin.id)).rejects.toMatchObject({ status: 404, message: "Curso não encontrado" });
   });
 });

@@ -25,4 +25,12 @@ export class StorageRepository implements IStorageRepository {
       contentType: data.type || "application/octet-stream",
     };
   }
+
+  async remove(path: string): Promise<void> {
+    const { error } = await getSupabase().storage.from(COURSE_IMAGES_BUCKET).remove([path]);
+
+    if (error) {
+      throw error;
+    }
+  }
 }

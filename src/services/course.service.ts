@@ -64,7 +64,7 @@ export class CourseService implements ICourseService {
     });
   }
 
-  async create(data: CreateCourseData): Promise<Course> {
+  async create(data: CreateCourseData, userId: number): Promise<Course> {
     const { image, ...courseData } = data;
     const categoryId = courseData.categoria_id ? courseData.categoria_id : null;
 
@@ -83,7 +83,34 @@ export class CourseService implements ICourseService {
       await this.storageRepository.upload(imagemPath, image);
     }
 
-    return this.courseRepository.create({ ...courseData, categoria_id: categoryId, imagemPath });
+    return this.courseRepository.create({
+      ...courseData,
+      categoria_id: categoryId,
+      imagemPath,
+      responsavelIds: [userId],
+    });
+  }
+
+  async delete(id: number, userId: number): Promise<void> {
+    const course = await this.courseRepository.findById(id);
+
+    if (!course) {
+      throw new HttpError("Curso não encontrado", 404);
+    }
+
+    if (!course.responsavelIds.includes(userId)) {
+      throw new HttpError("Somente os administradores responsáveis pelo curso podem excluí-lo", 403);
+    }
+
+    if (course.imagemPath) {
+      try {
+        await this.storageRepository.remove(course.imagemPath);
+      } catch {
+        // O curso deve ser removido mesmo se a capa já não existir no storage.
+      }
+    }
+
+    await this.courseRepository.delete(id);
   }
 
   async getImage(path: string): Promise<CourseImage> {

@@ -2,7 +2,10 @@ import { Prisma, User as PrismaUser } from "@/generated/prisma/client";
 import { Course } from "@/models/course.model";
 import { User } from "@/models/user.model";
 
-export const courseInclude = { categoria: true } satisfies Prisma.CursoInclude;
+export const courseInclude = {
+  categoria: true,
+  responsaveis: { select: { userId: true } },
+} satisfies Prisma.CursoInclude;
 
 type CourseRow = Prisma.CursoGetPayload<{ include: typeof courseInclude }>;
 
@@ -18,6 +21,7 @@ export function toCourse(row: CourseRow): Course {
     imagemPath: row.imagemPath,
     categoria: row.categoria,
     categoria_id: row.categoriaId,
+    responsavelIds: row.responsaveis.map((item) => item.userId),
   };
 }
 

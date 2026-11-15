@@ -18,8 +18,9 @@ model User {
   updatedAt     DateTime     @updatedAt @map("updated_at")
   sessions      Session[]
   accounts      Account[]
-  comentarios   Comentario[]
-  avaliacoes    Avaliacao[]
+  comentarios    Comentario[]
+  avaliacoes     Avaliacao[]
+  cursosResponsaveis CursoResponsavel[]
 
   @@map("users")
 }
@@ -92,9 +93,21 @@ model Curso {
   categoria    Categoria?   @relation(fields: [categoriaId], references: [id])
   comentarios  Comentario[]
   avaliacoes   Avaliacao[]
+  responsaveis CursoResponsavel[]
 
   @@index([categoriaId])
   @@map("cursos")
+}
+
+model CursoResponsavel {
+  userId  Int   @map("user_id")
+  cursoId Int   @map("curso_id")
+  user    User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  curso   Curso @relation(fields: [cursoId], references: [id], onDelete: Cascade)
+
+  @@id([userId, cursoId])
+  @@index([cursoId])
+  @@map("curso_responsaveis")
 }
 
 model Comentario {
@@ -104,7 +117,7 @@ model Comentario {
   userId  Int      @map("user_id")
   cursoId Int      @map("curso_id")
   user    User     @relation(fields: [userId], references: [id])
-  curso   Curso    @relation(fields: [cursoId], references: [id])
+  curso   Curso    @relation(fields: [cursoId], references: [id], onDelete: Cascade)
 
   @@index([cursoId])
   @@map("comentarios")
@@ -117,7 +130,7 @@ model Avaliacao {
   userId        Int      @map("user_id")
   cursoId       Int      @map("curso_id")
   user          User     @relation(fields: [userId], references: [id])
-  curso         Curso    @relation(fields: [cursoId], references: [id])
+  curso         Curso    @relation(fields: [cursoId], references: [id], onDelete: Cascade)
 
   @@index([cursoId])
   @@map("avaliacoes")

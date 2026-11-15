@@ -24,7 +24,7 @@ import { GET as getCategories } from "@/app/api/categorias/route";
 import { GET as getCoursesByCategory } from "@/app/api/categorias/categoria/[categoriaId]/route";
 import { GET as getComments } from "@/app/api/comentarios/curso/[cursoId]/route";
 import { POST as createComment } from "@/app/api/comentarios/route";
-import { GET as getCourse } from "@/app/api/cursos/[id]/route";
+import { GET as getCourse, DELETE as deleteCourse } from "@/app/api/cursos/[id]/route";
 import { GET as getCourses, POST as createCourse } from "@/app/api/cursos/route";
 import { GET as getUserByEmail } from "@/app/api/users/get-user-by-email/[email]/route";
 import { GET as getUser } from "@/app/api/users/get-user/[id]/route";
@@ -200,6 +200,61 @@ describe("Integração das rotas HTTP", () => {
       params: Promise.resolve({ id: "9999" }),
     });
     expect(missing.status).toBe(404);
+  });
+
+  it("permite excluir o curso somente ao admin responsável", async () => {
+    const payload = {
+      nome: "Curso para exclusão",
+      descricao: "Descrição longa o bastante",
+      cargaHoraria: 10,
+      nivel: "iniciante",
+      provider: "Fatec",
+      url: "https://example.com/excluir",
+      categoria_id: 1,
+    };
+    const created = await createCourse(courseRequest(payload, "Bearer admin"));
+    expect(created.status).toBe(200);
+    const course = await created.json();
+
+    const anonymous = await deleteCourse(new Request("http://localhost/api/cursos/" + course.id, { method: "DELETE" }), {
+      params: Promise.resolve({ id: String(course.id) }),
+    });
+    expect(anonymous.status).toBe(401);
+
+    const student = await deleteCourse(
+      new Request("http://localhost/api/cursos/" + course.id, {
+        method: "DELETE",
+        headers: { authorization: "Bearer aluno" },
+      }),
+      { params: Promise.resolve({ id: String(course.id) }) }
+    );
+    expect(student.status).toBe(403);
+
+    const otherAdmin = await deleteCourse(
+      new Request("http://localhost/api/cursos/" + course.id, {
+        method: "DELETE",
+        headers: { authorization: "Bearer outro-admin" },
+      }),
+      { params: Promise.resolve({ id: String(course.id) }) }
+    );
+    expect(otherAdmin.status).toBe(403);
+    await expect(otherAdmin.json()).resolves.toEqual({
+      error: "Somente os administradores responsáveis pelo curso podem excluí-lo",
+    });
+
+    const owner = await deleteCourse(
+      new Request("http://localhost/api/cursos/" + course.id, {
+        method: "DELETE",
+        headers: { authorization: "Bearer admin" },
+      }),
+      { params: Promise.resolve({ id: String(course.id) }) }
+    );
+    expect(owner.status).toBe(200);
+
+    const after = await getCourse(new Request("http://localhost/api/cursos/" + course.id), {
+      params: Promise.resolve({ id: String(course.id) }),
+    });
+    expect(after.status).toBe(404);
   });
 
   it("responde 400 para corpo inválido e 500 para falha inesperada", async () => {

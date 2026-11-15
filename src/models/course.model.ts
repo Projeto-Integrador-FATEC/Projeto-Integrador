@@ -13,6 +13,7 @@ export interface Course {
   imagemPath: string | null;
   categoria: Category | null;
   categoria_id: number | null;
+  responsavelIds: number[];
 }
 
 export interface CourseDetails extends Course {
@@ -35,6 +36,7 @@ export interface CreateCourseData {
 
 export interface SaveCourseData extends Omit<CreateCourseData, "image"> {
   imagemPath?: string | null;
+  responsavelIds: number[];
 }
 
 export interface CourseImage {

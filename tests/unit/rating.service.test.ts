@@ -20,7 +20,9 @@ describe("RatingService", () => {
     findAll: vi.fn(),
     findById: vi.fn(),
     findByCategoryId: vi.fn(),
+    search: vi.fn(),
     create: vi.fn(),
+    delete: vi.fn(),
   };
   const userRepository = {
     findAll: vi.fn(),

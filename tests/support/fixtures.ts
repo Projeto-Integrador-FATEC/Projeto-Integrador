@@ -19,6 +19,13 @@ export const admin: User = {
   role: "ADMIN",
 };
 
+export const outroAdmin: User = {
+  id: 3,
+  name: "Outro Admin",
+  email: "outro.admin@fatec.sp.gov.br",
+  role: "ADMIN",
+};
+
 export function makeCourse(overrides: Partial<Course> = {}): Course {
   return {
     id: 10,
@@ -31,6 +38,7 @@ export function makeCourse(overrides: Partial<Course> = {}): Course {
     imagemPath: null,
     categoria: tecnologia,
     categoria_id: tecnologia.id,
+    responsavelIds: [admin.id],
     ...overrides,
   };
 }

@@ -19,7 +19,7 @@ import { CourseService } from "@/services/course.service";
 import { EmailService } from "@/services/email.service";
 import { RatingService } from "@/services/rating.service";
 import { UserService } from "@/services/user.service";
-import { aluno, admin, cursoGestao, cursoTecnologia, gestao, tecnologia } from "./fixtures";
+import { aluno, admin, outroAdmin, cursoGestao, cursoTecnologia, gestao, tecnologia } from "./fixtures";
 
 export interface TestApp {
   emails: SendEmailData[];
@@ -36,10 +36,11 @@ export interface TestApp {
 const SENHA_VALIDA = "senha1234";
 
 export function createTestApp(): TestApp {
-  const users: User[] = [{ ...aluno }, { ...admin }];
+  const users: User[] = [{ ...aluno }, { ...admin }, { ...outroAdmin }];
   const passwords = new Map<string, string>([
     [aluno.email, SENHA_VALIDA],
     [admin.email, SENHA_VALIDA],
+    [outroAdmin.email, SENHA_VALIDA],
   ]);
   const categories: Category[] = [{ ...tecnologia }, { ...gestao }];
   const courses: Course[] = [{ ...cursoTecnologia }, { ...cursoGestao }];
@@ -67,6 +68,18 @@ export function createTestApp(): TestApp {
     findAll: async () => courses.map((course) => ({ ...course })),
     findById: async (id) => courses.find((course) => course.id === id) ?? null,
     findByCategoryId: async (categoryId) => courses.filter((course) => course.categoria_id === categoryId),
+    search: async (filters) => {
+      const matches = courses.filter((course) => {
+        if (filters.nivel && course.nivel !== filters.nivel) {
+          return false;
+        }
+        if (typeof filters.categoriaId === "number" && course.categoria_id !== filters.categoriaId) {
+          return false;
+        }
+        return true;
+      });
+      return { total: matches.length, courses: matches.slice(0, filters.limite) };
+    },
     create: async (data: SaveCourseData) => {
       const category = data.categoria_id
         ? categories.find((item) => item.id === data.categoria_id) ?? null
@@ -82,9 +95,26 @@ export function createTestApp(): TestApp {
         imagemPath: data.imagemPath ?? null,
         categoria: category,
         categoria_id: category?.id ?? null,
+        responsavelIds: [...data.responsavelIds],
       };
       courses.push(course);
       return course;
+    },
+    delete: async (id) => {
+      const index = courses.findIndex((course) => course.id === id);
+      if (index >= 0) {
+        courses.splice(index, 1);
+      }
+      for (let i = comments.length - 1; i >= 0; i -= 1) {
+        if (comments[i].curso.id === id) {
+          comments.splice(i, 1);
+        }
+      }
+      for (let i = ratings.length - 1; i >= 0; i -= 1) {
+        if (ratings[i].curso.id === id) {
+          ratings.splice(i, 1);
+        }
+      }
     },
   };
 
@@ -141,6 +171,9 @@ export function createTestApp(): TestApp {
       images.set(path, { body: await file.arrayBuffer(), contentType: file.type || "application/octet-stream" });
     },
     download: async (path) => images.get(path) ?? null,
+    remove: async (path) => {
+      images.delete(path);
+    },
   };
 
   const emailRepository: IEmailRepository = {
@@ -185,6 +218,9 @@ export function createTestApp(): TestApp {
       }
       if (authorization === "Bearer aluno") {
         return { ...aluno };
+      }
+      if (authorization === "Bearer outro-admin") {
+        return { ...outroAdmin };
       }
       return null;
     },

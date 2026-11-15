@@ -110,7 +110,7 @@ export default function Home() {
           </Card>
         </motion.div>
 
-        {isAdmin && (
+        {isAdmin ? (
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
@@ -145,10 +145,63 @@ export default function Home() {
                 </CardDescription>
               </CardHeader>
 
-              <CardContent className="pt-0">
+              <CardContent className="pt-0 flex flex-col gap-2">
                 <Link href="/cadastrar-curso">
                   <Button className="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 rounded-lg transition-colors group-hover:shadow-md">
                     Cadastrar Curso →
+                  </Button>
+                </Link>
+                {/* <Link href="/solicitacoes-admin">
+                  <Button
+                    variant="outline"
+                    className="w-full border-purple-400 text-purple-800 dark:text-purple-200"
+                  >
+                    Ver chamados de administrador
+                  </Button>
+                </Link> */}
+              </CardContent>
+            </Card>
+          </motion.div>
+        ) : (
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+            className="flex-1 w-full"
+          >
+            <Card className="h-full justify-between bg-gradient-to-br from-purple-50 to-violet-100 dark:from-purple-950 dark:to-violet-900 border-purple-200 dark:border-purple-700 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 group cursor-pointer">
+              <CardHeader className="pb-4">
+                <div className="w-12 h-12 bg-purple-500 rounded-lg flex items-center justify-center mb-4 group-hover:bg-purple-600 transition-colors">
+                  <svg
+                    className="w-6 h-6 text-white"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                    />
+                  </svg>
+                </div>
+
+                <CardTitle className="text-xl font-bold text-purple-900 dark:text-purple-100 group-hover:text-purple-700 dark:group-hover:text-purple-200">
+                  🚀 Quero cadastrar cursos
+                </CardTitle>
+
+                <CardDescription className="text-purple-700 dark:text-purple-300 leading-relaxed">
+                  Abra um chamado para se tornar administrador. Outros
+                  administradores analisam o pedido e liberam o cadastro de
+                  cursos.
+                </CardDescription>
+              </CardHeader>
+
+              <CardContent className="pt-0">
+                <Link href="/solicitar-admin">
+                  <Button className="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 rounded-lg transition-colors group-hover:shadow-md">
+                    Solicitar perfil de administrador →
                   </Button>
                 </Link>
               </CardContent>

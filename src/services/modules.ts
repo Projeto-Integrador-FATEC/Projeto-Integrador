@@ -1,3 +1,4 @@
+import { AdminRequestRepository } from "@/repositories/admin-request.repository";
 import { AuthRepository } from "@/repositories/auth.repository";
 import { CategoryRepository } from "@/repositories/category.repository";
 import { ChatRepository } from "@/repositories/chat.repository";
@@ -7,6 +8,7 @@ import { EmailRepository } from "@/repositories/email.repository";
 import { RatingRepository } from "@/repositories/rating.repository";
 import { StorageRepository } from "@/repositories/storage.repository";
 import { UserRepository } from "@/repositories/user.repository";
+import { AdminRequestService } from "./admin-request.service";
 import { CategoryService } from "./category.service";
 import { ChatService } from "./chat.service";
 import { CommentService } from "./comment.service";
@@ -14,6 +16,7 @@ import { CourseService } from "./course.service";
 import { EmailService } from "./email.service";
 import { RatingService } from "./rating.service";
 import { UserService } from "./user.service";
+import { IAdminRequestService } from "./interfaces/admin-request-service.interface";
 import { ICategoryService } from "./interfaces/category-service.interface";
 import { IChatService } from "./interfaces/chat-service.interface";
 import { ICommentService } from "./interfaces/comment-service.interface";
@@ -31,6 +34,7 @@ const ratingRepository = new RatingRepository();
 const storageRepository = new StorageRepository();
 const emailRepository = new EmailRepository();
 const chatRepository = new ChatRepository();
+const adminRequestRepository = new AdminRequestRepository();
 
 const categoryService = new CategoryService(categoryRepository, courseRepository);
 const courseService = new CourseService(courseRepository, categoryRepository, storageRepository);
@@ -45,6 +49,7 @@ interface Modules {
     rating: IRatingService;
     email: IEmailService;
     chat: IChatService;
+    adminRequest: IAdminRequestService;
   };
 }
 
@@ -57,5 +62,6 @@ export const modules: Modules = {
     rating: ratingService,
     email: new EmailService(emailRepository),
     chat: new ChatService(chatRepository, courseService, categoryService, ratingService),
+    adminRequest: new AdminRequestService(adminRequestRepository, userRepository),
   },
 };

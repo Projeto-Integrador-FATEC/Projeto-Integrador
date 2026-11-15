@@ -18,4 +18,9 @@ export class UserRepository implements IUserRepository {
     const row = await prisma.user.findUnique({ where: { email } });
     return row ? toUser(row) : null;
   }
+
+  async updateRole(id: number, role: string): Promise<User> {
+    const row = await prisma.user.update({ where: { id }, data: { role } });
+    return toUser(row);
+  }
 }

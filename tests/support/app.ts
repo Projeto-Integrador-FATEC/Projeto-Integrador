@@ -1,10 +1,12 @@
 import { HttpError } from "@/lib/http-error";
+import { AdminRequest } from "@/models/admin-request.model";
 import { Category } from "@/models/category.model";
 import { Comment } from "@/models/comment.model";
 import { Course, SaveCourseData } from "@/models/course.model";
 import { SendEmailData } from "@/models/email.model";
 import { Rating } from "@/models/rating.model";
 import { CreateUserData, User } from "@/models/user.model";
+import { IAdminRequestRepository } from "@/repositories/interfaces/admin-request-repository.interface";
 import { IAuthRepository } from "@/repositories/interfaces/auth-repository.interface";
 import { ICategoryRepository } from "@/repositories/interfaces/category-repository.interface";
 import { ICommentRepository } from "@/repositories/interfaces/comment-repository.interface";
@@ -13,12 +15,14 @@ import { IEmailRepository } from "@/repositories/interfaces/email-repository.int
 import { IRatingRepository } from "@/repositories/interfaces/rating-repository.interface";
 import { IStorageRepository } from "@/repositories/interfaces/storage-repository.interface";
 import { IUserRepository } from "@/repositories/interfaces/user-repository.interface";
+import { AdminRequestService } from "@/services/admin-request.service";
 import { CategoryService } from "@/services/category.service";
 import { CommentService } from "@/services/comment.service";
 import { CourseService } from "@/services/course.service";
 import { EmailService } from "@/services/email.service";
 import { RatingService } from "@/services/rating.service";
 import { UserService } from "@/services/user.service";
+import { IAdminRequestService } from "@/services/interfaces/admin-request-service.interface";
 import { aluno, admin, outroAdmin, cursoGestao, cursoTecnologia, gestao, tecnologia } from "./fixtures";
 
 export interface TestApp {
@@ -30,6 +34,7 @@ export interface TestApp {
     comment: CommentService;
     rating: RatingService;
     email: EmailService;
+    adminRequest: IAdminRequestService;
   };
 }
 
@@ -52,11 +57,58 @@ export function createTestApp(): TestApp {
   let nextCourseId = 12;
   let nextCommentId = 1;
   let nextRatingId = 1;
+  let nextAdminRequestId = 1;
+  const adminRequests: AdminRequest[] = [];
 
   const userRepository: IUserRepository = {
     findAll: async () => users.map((user) => ({ ...user })),
     findById: async (id) => users.find((user) => user.id === id) ?? null,
     findByEmail: async (email) => users.find((user) => user.email === email) ?? null,
+    updateRole: async (id, role) => {
+      const user = users.find((item) => item.id === id);
+
+      if (!user) {
+        throw new HttpError("Usuário não encontrado", 404);
+      }
+
+      user.role = role;
+      return { ...user };
+    },
+  };
+
+  const toAdminRequest = (request: AdminRequest): AdminRequest => ({ ...request });
+
+  const adminRequestRepository: IAdminRequestRepository = {
+    create: async (userId, justificativa) => {
+      const user = users.find((item) => item.id === userId)!;
+      const now = new Date().toISOString();
+      const request: AdminRequest = {
+        id: nextAdminRequestId++,
+        justificativa,
+        status: "PENDENTE",
+        userId,
+        userName: user.name,
+        userEmail: user.email,
+        reviewedById: null,
+        createdAt: now,
+        updatedAt: now,
+      };
+      adminRequests.push(request);
+      return toAdminRequest(request);
+    },
+    findById: async (id) => adminRequests.find((item) => item.id === id) ?? null,
+    findPendingByUserId: async (userId) =>
+      adminRequests.find((item) => item.userId === userId && item.status === "PENDENTE") ?? null,
+    findLatestByUserId: async (userId) =>
+      [...adminRequests].reverse().find((item) => item.userId === userId) ?? null,
+    findAll: async () => adminRequests.map(toAdminRequest),
+    review: async (id, status, reviewedById) => {
+      const request = adminRequests.find((item) => item.id === id)!;
+      request.status = status;
+      request.reviewedById = reviewedById;
+      request.updatedAt = new Date().toISOString();
+      return toAdminRequest(request);
+    },
   };
 
   const categoryRepository: ICategoryRepository = {
@@ -213,16 +265,21 @@ export function createTestApp(): TestApp {
     signOut: async () => undefined,
     getSessionUser: async (headers) => {
       const authorization = headers.get("authorization");
-      if (authorization === "Bearer admin") {
-        return { ...admin };
+      const id =
+        authorization === "Bearer admin"
+          ? admin.id
+          : authorization === "Bearer aluno"
+            ? aluno.id
+            : authorization === "Bearer outro-admin"
+              ? outroAdmin.id
+              : null;
+
+      if (id === null) {
+        return null;
       }
-      if (authorization === "Bearer aluno") {
-        return { ...aluno };
-      }
-      if (authorization === "Bearer outro-admin") {
-        return { ...outroAdmin };
-      }
-      return null;
+
+      const user = users.find((item) => item.id === id);
+      return user ? { ...user } : null;
     },
   };
 
@@ -235,6 +292,7 @@ export function createTestApp(): TestApp {
       comment: new CommentService(commentRepository, courseRepository, userRepository),
       rating: new RatingService(ratingRepository, courseRepository, userRepository),
       email: emailService,
+      adminRequest: new AdminRequestService(adminRequestRepository, userRepository),
     },
   };
 }

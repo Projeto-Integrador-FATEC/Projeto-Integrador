@@ -7,7 +7,10 @@ import { redirect } from "next/navigation";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { modules } from "@/services/modules";
 
-export function Header() {
+export async function Header() {
+  const user = await modules.services.user.getSessionUser(await headers());
+  const isAdmin = user?.role === "ADMIN";
+
   return (
     <header className="w-full bg-violet-500 dark:bg-violet-600 shadow-md py-4 px-8 flex items-center justify-center gap-4">
       <div className="flex max-w-6xl w-full items-center justify-between">
@@ -16,6 +19,11 @@ export function Header() {
           <h1 className="text-white text-2xl font-bold">Study Lovers</h1>
         </Link>
         <div className="ml-auto flex items-center gap-4">
+          {isAdmin && (
+            <Button asChild variant="ghost" className="text-white hover:bg-violet-600 hover:text-white">
+              <Link href="/solicitacoes-admin">Chamados</Link>
+            </Button>
+          )}
           <ThemeToggle />
           <form action={async () => {
             "use server"

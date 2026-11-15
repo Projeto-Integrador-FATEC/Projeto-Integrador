@@ -31,6 +31,9 @@ import { GET as getUser } from "@/app/api/users/get-user/[id]/route";
 import { POST as login } from "@/app/api/users/login/route";
 import { GET as getUsers, POST as createUser } from "@/app/api/users/route";
 import { GET as getImage } from "@/app/imagens/[...path]/route";
+import { GET as listAdminRequests, POST as createAdminRequest } from "@/app/api/solicitacoes-admin/route";
+import { GET as getMyAdminRequest } from "@/app/api/solicitacoes-admin/minha/route";
+import { PATCH as reviewAdminRequest } from "@/app/api/solicitacoes-admin/[id]/route";
 
 describe("Integração das rotas HTTP", () => {
   beforeEach(() => {
@@ -421,6 +424,60 @@ describe("Integração das rotas HTTP", () => {
       params: Promise.resolve({ path: ["ausente.png"] }),
     });
     expect(missing.status).toBe(404);
+  });
+
+  it("aluno abre chamado de administrador e outro admin aprova", async () => {
+    const justificativa = "Represento uma instituição e preciso cadastrar cursos gratuitos.";
+
+    const anonymous = await createAdminRequest(
+      jsonRequest("http://localhost/api/solicitacoes-admin", { justificativa })
+    );
+    expect(anonymous.status).toBe(401);
+
+    const created = await createAdminRequest(
+      jsonRequest("http://localhost/api/solicitacoes-admin", { justificativa }, { headers: { authorization: "Bearer aluno" } })
+    );
+    expect(created.status).toBe(201);
+    const request = await created.json();
+    expect(request).toMatchObject({ status: "PENDENTE", userId: aluno.id });
+
+    const duplicate = await createAdminRequest(
+      jsonRequest("http://localhost/api/solicitacoes-admin", { justificativa }, { headers: { authorization: "Bearer aluno" } })
+    );
+    expect(duplicate.status).toBe(409);
+
+    const mine = await getMyAdminRequest(
+      new Request("http://localhost/api/solicitacoes-admin/minha", { headers: { authorization: "Bearer aluno" } })
+    );
+    expect(mine.status).toBe(200);
+    await expect(mine.json()).resolves.toMatchObject({ id: request.id, status: "PENDENTE" });
+
+    const asStudent = await listAdminRequests(
+      new Request("http://localhost/api/solicitacoes-admin", { headers: { authorization: "Bearer aluno" } })
+    );
+    expect(asStudent.status).toBe(403);
+
+    const queue = await listAdminRequests(
+      new Request("http://localhost/api/solicitacoes-admin", { headers: { authorization: "Bearer admin" } })
+    );
+    expect(queue.status).toBe(200);
+    await expect(queue.json()).resolves.toEqual([expect.objectContaining({ id: request.id })]);
+
+    const approved = await reviewAdminRequest(
+      jsonRequest(
+        "http://localhost/api/solicitacoes-admin/1",
+        { status: "APROVADA" },
+        { method: "PATCH", headers: { authorization: "Bearer admin" } }
+      ),
+      { params: Promise.resolve({ id: String(request.id) }) }
+    );
+    expect(approved.status).toBe(200);
+    await expect(approved.json()).resolves.toMatchObject({ status: "APROVADA" });
+
+    const promoted = await getUser(new Request("http://localhost/api/users/1"), {
+      params: Promise.resolve({ id: "1" }),
+    });
+    await expect(promoted.json()).resolves.toMatchObject({ id: aluno.id, role: "ADMIN" });
   });
 });
 

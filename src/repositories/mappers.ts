@@ -1,4 +1,5 @@
 import { Prisma, User as PrismaUser } from "@/generated/prisma/client";
+import { AdminRequest, AdminRequestStatus } from "@/models/admin-request.model";
 import { Course } from "@/models/course.model";
 import { User } from "@/models/user.model";
 
@@ -31,5 +32,25 @@ export function toUser(row: PrismaUser): User {
     name: row.name,
     email: row.email,
     role: row.role,
+  };
+}
+
+export const adminRequestInclude = {
+  user: { select: { name: true, email: true } },
+} satisfies Prisma.SolicitacaoAdminInclude;
+
+type AdminRequestRow = Prisma.SolicitacaoAdminGetPayload<{ include: typeof adminRequestInclude }>;
+
+export function toAdminRequest(row: AdminRequestRow): AdminRequest {
+  return {
+    id: row.id,
+    justificativa: row.justificativa,
+    status: row.status as AdminRequestStatus,
+    userId: row.userId,
+    userName: row.user.name,
+    userEmail: row.user.email,
+    reviewedById: row.reviewedById,
+    createdAt: row.createdAt.toISOString(),
+    updatedAt: row.updatedAt.toISOString(),
   };
 }

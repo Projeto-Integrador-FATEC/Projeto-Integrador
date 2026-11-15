@@ -28,6 +28,7 @@ describe("CommentService", () => {
     findAll: vi.fn(),
     findById: vi.fn(),
     findByEmail: vi.fn(),
+    updateRole: vi.fn(),
   };
   const service = new CommentService(commentRepository, courseRepository, userRepository);
 

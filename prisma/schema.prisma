@@ -21,6 +21,8 @@ model User {
   comentarios    Comentario[]
   avaliacoes     Avaliacao[]
   cursosResponsaveis CursoResponsavel[]
+  solicitacoesAdmin          SolicitacaoAdmin[] @relation("SolicitacaoAdminUsuario")
+  solicitacoesAdminRevisadas SolicitacaoAdmin[] @relation("SolicitacaoAdminRevisor")
 
   @@map("users")
 }
@@ -121,6 +123,22 @@ model Comentario {
 
   @@index([cursoId])
   @@map("comentarios")
+}
+
+model SolicitacaoAdmin {
+  id            Int      @id @default(autoincrement())
+  justificativa String   @db.Text
+  status        String   @default("PENDENTE")
+  userId        Int      @map("user_id")
+  user          User     @relation("SolicitacaoAdminUsuario", fields: [userId], references: [id], onDelete: Cascade)
+  reviewedById  Int?     @map("reviewed_by_id")
+  reviewedBy    User?    @relation("SolicitacaoAdminRevisor", fields: [reviewedById], references: [id], onDelete: SetNull)
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  @@index([userId])
+  @@index([status])
+  @@map("solicitacoes_admin")
 }
 
 model Avaliacao {

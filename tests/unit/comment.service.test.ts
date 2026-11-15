@@ -20,6 +20,7 @@ describe("CommentService", () => {
     findAll: vi.fn(),
     findById: vi.fn(),
     findByCategoryId: vi.fn(),
+    search: vi.fn(),
     create: vi.fn(),
   };
   const userRepository = {

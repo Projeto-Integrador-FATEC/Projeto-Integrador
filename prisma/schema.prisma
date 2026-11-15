@@ -20,6 +20,7 @@ model User {
   accounts      Account[]
   comentarios   Comentario[]
   avaliacoes    Avaliacao[]
+  conversations AgentConversation[]
 
   @@map("users")
 }
@@ -121,4 +122,16 @@ model Avaliacao {
 
   @@index([cursoId])
   @@map("avaliacoes")
+}
+
+model AgentConversation {
+  id          String   @id @default(uuid())
+  userId      Int      @map("user_id")
+  historyJson String   @map("history_json") @db.Text
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("agent_conversations")
 }

@@ -13,6 +13,9 @@ vi.mock("@/services/modules", () => ({
       get services() {
         return doubles.app!.services;
       },
+      get repositories() {
+        return doubles.app!.repositories;
+      },
     };
   },
 }));

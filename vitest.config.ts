@@ -5,6 +5,12 @@ export default defineConfig({
   plugins: [tsconfigPaths()],
   test: {
     environment: "node",
+    pool: "threads",
+    poolOptions: {
+      threads: {
+        singleThread: true,
+      },
+    },
     include: ["tests/**/*.test.ts"],
     coverage: {
       provider: "v8",

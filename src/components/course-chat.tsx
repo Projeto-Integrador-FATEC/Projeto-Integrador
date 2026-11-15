@@ -34,6 +34,26 @@ export function CourseChat() {
   const [error, setError] = useState<string | null>(null);
   const [messages, setMessages] = useState<ChatTurn[]>([]);
 
+  useEffect(() => {
+    if (!open || messages.length > 0) {
+      return;
+    }
+
+    let cancelled = false;
+    fetch("/api/chat")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (!cancelled && Array.isArray(data?.messages) && data.messages.length > 0) {
+          setMessages(data.messages);
+        }
+      })
+      .catch(() => {});
+
+    return () => {
+      cancelled = true;
+    };
+  }, [open, messages.length]);
+
   async function send(content: string) {
     const question = content.trim();
 

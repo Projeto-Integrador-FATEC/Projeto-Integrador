@@ -5,24 +5,33 @@ import { Course, SaveCourseData } from "@/models/course.model";
 import { SendEmailData } from "@/models/email.model";
 import { Rating } from "@/models/rating.model";
 import { CreateUserData, User } from "@/models/user.model";
+import { AgentConversationRecord } from "@/models/conversation.model";
 import { IAuthRepository } from "@/repositories/interfaces/auth-repository.interface";
 import { ICategoryRepository } from "@/repositories/interfaces/category-repository.interface";
+import { IChatRepository } from "@/repositories/interfaces/chat-repository.interface";
 import { ICommentRepository } from "@/repositories/interfaces/comment-repository.interface";
+import { IConversationRepository } from "@/repositories/interfaces/conversation-repository.interface";
 import { ICourseRepository } from "@/repositories/interfaces/course-repository.interface";
 import { IEmailRepository } from "@/repositories/interfaces/email-repository.interface";
 import { IRatingRepository } from "@/repositories/interfaces/rating-repository.interface";
 import { IStorageRepository } from "@/repositories/interfaces/storage-repository.interface";
 import { IUserRepository } from "@/repositories/interfaces/user-repository.interface";
 import { CategoryService } from "@/services/category.service";
+import { ChatService } from "@/services/chat.service";
 import { CommentService } from "@/services/comment.service";
 import { CourseService } from "@/services/course.service";
 import { EmailService } from "@/services/email.service";
+import { IChatService } from "@/services/interfaces/chat-service.interface";
+import { IRecommenderService } from "@/services/interfaces/recommender-service.interface";
 import { RatingService } from "@/services/rating.service";
 import { UserService } from "@/services/user.service";
 import { aluno, admin, cursoGestao, cursoTecnologia, gestao, tecnologia } from "./fixtures";
 
 export interface TestApp {
   emails: SendEmailData[];
+  conversations: AgentConversationRecord[];
+  chatRepository: IChatRepository;
+  recommenderService: IRecommenderService;
   services: {
     user: UserService;
     category: CategoryService;
@@ -30,6 +39,11 @@ export interface TestApp {
     comment: CommentService;
     rating: RatingService;
     email: EmailService;
+    chat: IChatService;
+    recommender: IRecommenderService;
+  };
+  repositories: {
+    conversation: IConversationRepository;
   };
 }
 
@@ -67,6 +81,25 @@ export function createTestApp(): TestApp {
     findAll: async () => courses.map((course) => ({ ...course })),
     findById: async (id) => courses.find((course) => course.id === id) ?? null,
     findByCategoryId: async (categoryId) => courses.filter((course) => course.categoria_id === categoryId),
+    search: async (filters) => {
+      const filtered = courses.filter((course) => {
+        if (filters.termo) {
+          const term = filters.termo.toLowerCase();
+          const matchName = course.nome.toLowerCase().includes(term);
+          const matchDesc = course.descricao.toLowerCase().includes(term);
+          const matchProvider = course.provider.toLowerCase().includes(term);
+          if (!matchName && !matchDesc && !matchProvider) return false;
+        }
+        if (filters.nivel && course.nivel.toLowerCase() !== filters.nivel.toLowerCase()) return false;
+        if (filters.categoriaId && course.categoria_id !== filters.categoriaId) return false;
+        return true;
+      });
+      const limit = filters.limite ?? 10;
+      return {
+        total: filtered.length,
+        courses: filtered.slice(0, limit),
+      };
+    },
     create: async (data: SaveCourseData) => {
       const category = data.categoria_id
         ? categories.find((item) => item.id === data.categoria_id) ?? null
@@ -190,15 +223,76 @@ export function createTestApp(): TestApp {
     },
   };
 
+  const conversations: AgentConversationRecord[] = [];
+  const conversationRepository: IConversationRepository = {
+    findLatestByUserId: async (userId) => {
+      const found = [...conversations].reverse().find((c) => c.userId === userId);
+      return found ? { ...found } : null;
+    },
+    save: async (userId, history, conversationId) => {
+      const id = conversationId || `conv-${conversations.length + 1}`;
+      const record: AgentConversationRecord = {
+        id,
+        userId,
+        history: [...history],
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+      const idx = conversations.findIndex((c) => c.id === id);
+      if (idx >= 0) {
+        conversations[idx] = record;
+      } else {
+        conversations.push(record);
+      }
+      return record;
+    },
+  };
+
+  const chatRepository: IChatRepository = {
+    complete: async () => ({
+      content: "Resposta padrão do assistente",
+      toolCalls: [],
+      steps: [],
+    }),
+  };
+
+  const recommenderService: IRecommenderService = {
+    getRecommendation: async () => ({
+      resposta: "Recomendação padrão do especialista Java",
+      conversationId: "conv-java-1",
+    }),
+    isHealthy: async () => true,
+  };
+
+  const categoryService = new CategoryService(categoryRepository, courseRepository);
+  const courseService = new CourseService(courseRepository, categoryRepository, storageRepository);
+  const ratingService = new RatingService(ratingRepository, courseRepository, userRepository);
+  const chatService = new ChatService(
+    chatRepository,
+    courseService,
+    categoryService,
+    ratingService,
+    recommenderService,
+    conversationRepository,
+  );
+
   return {
     emails,
+    conversations,
+    chatRepository,
+    recommenderService,
     services: {
       user: new UserService(userRepository, authRepository),
-      category: new CategoryService(categoryRepository, courseRepository),
-      course: new CourseService(courseRepository, categoryRepository, storageRepository),
+      category: categoryService,
+      course: courseService,
       comment: new CommentService(commentRepository, courseRepository, userRepository),
-      rating: new RatingService(ratingRepository, courseRepository, userRepository),
+      rating: ratingService,
       email: emailService,
+      chat: chatService,
+      recommender: recommenderService,
+    },
+    repositories: {
+      conversation: conversationRepository,
     },
   };
 }

@@ -1,5 +1,5 @@
 #!/bin/sh
 set -eu
 
-prisma migrate deploy
+./node_modules/.bin/prisma migrate deploy
 exec node server.js

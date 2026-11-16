@@ -31,32 +31,37 @@ export class CourseRepository implements ICourseRepository {
     const conditions: Prisma.Sql[] = [];
 
     if (filters.termo) {
-      const pattern = `%${escapeLike(fold(filters.termo))}%`;
-      conditions.push(Prisma.sql`(
-        ${folded("nome")} LIKE ${pattern}
-        OR ${folded("descricao")} LIKE ${pattern}
-        OR ${folded("provider")} LIKE ${pattern}
-      )`);
+      const tokenMatches = searchTokens(filters.termo).map((token) => {
+        const pattern = `%${escapeLike(token)}%`;
+        return Prisma.sql`(
+          ${folded("cursos.nome")} LIKE ${pattern}
+          OR ${folded("cursos.descricao")} LIKE ${pattern}
+          OR ${folded("cursos.provider")} LIKE ${pattern}
+          OR ${folded("categorias.nome")} LIKE ${pattern}
+        )`;
+      });
+      conditions.push(Prisma.sql`(${Prisma.join(tokenMatches, " OR ")})`);
     }
 
     if (filters.nivel) {
-      conditions.push(Prisma.sql`${folded("nivel")} = ${fold(filters.nivel)}`);
+      conditions.push(Prisma.sql`${folded("cursos.nivel")} = ${fold(filters.nivel)}`);
     }
 
     if (typeof filters.categoriaId === "number") {
-      conditions.push(Prisma.sql`categoria_id = ${filters.categoriaId}`);
+      conditions.push(Prisma.sql`cursos.categoria_id = ${filters.categoriaId}`);
     }
 
     const where = conditions.length > 0 ? Prisma.sql`WHERE ${Prisma.join(conditions, " AND ")}` : Prisma.empty;
+    const from = Prisma.sql`FROM cursos LEFT JOIN categorias ON categorias.id = cursos.categoria_id`;
 
     const countRows = await prisma.$queryRaw<Array<{ total: number }>>`
-      SELECT COUNT(*)::int AS total FROM cursos ${where}
+      SELECT COUNT(*)::int AS total ${from} ${where}
     `;
     const total = Number(countRows[0]?.total ?? 0);
 
     const idRows = await prisma.$queryRaw<Array<{ id: number }>>`
-      SELECT id FROM cursos ${where}
-      ORDER BY nome ASC
+      SELECT cursos.id ${from} ${where}
+      ORDER BY cursos.nome ASC
       LIMIT ${filters.limite}
     `;
 
@@ -104,8 +109,46 @@ export class CourseRepository implements ICourseRepository {
   }
 }
 
-function folded(column: "nome" | "descricao" | "provider" | "nivel"): Prisma.Sql {
+const SEARCH_STOPWORDS = new Set([
+  "a",
+  "as",
+  "com",
+  "curso",
+  "cursos",
+  "da",
+  "das",
+  "de",
+  "do",
+  "dos",
+  "e",
+  "em",
+  "na",
+  "no",
+  "o",
+  "os",
+  "ou",
+  "para",
+  "quais",
+  "qual",
+  "que",
+  "sobre",
+  "tem",
+  "um",
+  "uma",
+  "voce",
+  "voces",
+]);
+
+function folded(column: "cursos.nome" | "cursos.descricao" | "cursos.provider" | "cursos.nivel" | "categorias.nome"): Prisma.Sql {
   return Prisma.sql`translate(lower(${Prisma.raw(column)}), ${ACCENTED}, ${PLAIN})`;
+}
+
+function searchTokens(termo: string): string[] {
+  const tokens = fold(termo)
+    .split(/[^\p{L}\p{N}]+/u)
+    .filter((token) => token.length >= 3 && !SEARCH_STOPWORDS.has(token));
+
+  return tokens.length > 0 ? [...new Set(tokens)] : [fold(termo)];
 }
 
 function fold(value: string): string {

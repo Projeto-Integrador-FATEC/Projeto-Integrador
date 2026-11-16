@@ -111,7 +111,7 @@ function CourseChatPanel({
   onSend: (content: string) => void;
 }) {
   return (
-    <SheetContent className="h-full w-full gap-0 p-0 sm:max-w-md">
+    <SheetContent className="h-full w-full min-w-0 gap-0 overflow-hidden p-0 sm:max-w-lg">
       <SheetHeader className="pr-10">
         <SheetTitle>Assistente de cursos</SheetTitle>
         <SheetDescription>Pergunte sobre os cursos cadastrados na plataforma.</SheetDescription>
@@ -142,8 +142,8 @@ function CourseChatTranscript({
   }, [messages, pending, error]);
 
   return (
-    <ScrollArea className="min-h-0 flex-1 px-4">
-      <div className="flex flex-col gap-3 py-4">
+    <ScrollArea className="min-h-0 min-w-0 flex-1 overflow-hidden px-4 [&>[data-slot=scroll-area-viewport]]:max-w-full [&>[data-slot=scroll-area-viewport]]:overflow-x-hidden">
+      <div className="flex min-w-0 flex-col gap-3 py-4">
         {messages.length === 0 ? <CourseChatSuggestions disabled={pending} onSuggest={onSuggest} /> : null}
         {messages.map((message, index) => (
           <CourseChatMessage key={`${message.role}-${index}`} message={message} />
@@ -186,15 +186,15 @@ function CourseChatMessage({ message }: { message: ChatTurn }) {
   const own = message.role === "user";
 
   return (
-    <div className={own ? "flex justify-end" : "flex justify-start"}>
+    <div className={own ? "flex min-w-0 justify-end" : "flex min-w-0 justify-start"}>
       <div
         className={
           own
-            ? "bg-primary text-primary-foreground max-w-[85%] rounded-lg px-3 py-2 text-sm"
-            : "bg-muted max-w-[85%] rounded-lg px-3 py-2 text-sm"
+            ? "bg-primary text-primary-foreground min-w-0 max-w-[85%] rounded-lg px-3 py-2 text-sm break-words wrap-anywhere"
+            : "bg-muted min-w-0 max-w-[85%] rounded-lg px-3 py-2 text-sm break-words wrap-anywhere"
         }
       >
-        {own ? <p className="whitespace-pre-wrap">{message.content}</p> : <ChatMarkdown text={message.content} />}
+        {own ? <p className="whitespace-pre-wrap break-words wrap-anywhere">{message.content}</p> : <ChatMarkdown text={message.content} />}
       </div>
     </div>
   );
@@ -242,10 +242,10 @@ function CourseChatComposer({
 
 const markdownComponents: Components = {
   a: ChatMarkdownLink,
-  p: ({ children }) => <p>{children}</p>,
-  ul: ({ children }) => <ul className="flex list-disc flex-col gap-1 pl-4">{children}</ul>,
-  ol: ({ children }) => <ol className="flex list-decimal flex-col gap-1 pl-4">{children}</ol>,
-  li: ({ children }) => <li>{children}</li>,
+  p: ({ children }) => <p className="wrap-anywhere">{children}</p>,
+  ul: ({ children }) => <ul className="flex min-w-0 list-disc flex-col gap-1 pl-4">{children}</ul>,
+  ol: ({ children }) => <ol className="flex min-w-0 list-decimal flex-col gap-1 pl-4">{children}</ol>,
+  li: ({ children }) => <li className="min-w-0 wrap-anywhere">{children}</li>,
   strong: ({ children }) => <strong className="font-semibold">{children}</strong>,
   h1: ({ children }) => <p className="font-semibold">{children}</p>,
   h2: ({ children }) => <p className="font-semibold">{children}</p>,
@@ -263,7 +263,7 @@ const markdownComponents: Components = {
 
 function ChatMarkdown({ text }: { text: string }) {
   return (
-    <div className="flex flex-col gap-2 break-words">
+    <div className="flex min-w-0 flex-col gap-2 break-words wrap-anywhere">
       <ReactMarkdown remarkPlugins={[remarkGfm, remarkBreaks]} components={markdownComponents}>
         {withCourseLinks(text)}
       </ReactMarkdown>
@@ -278,7 +278,7 @@ function withCourseLinks(text: string): string {
 function ChatMarkdownLink({ href, children }: { href?: string; children?: ReactNode }) {
   if (href?.startsWith("/curso-details/")) {
     return (
-      <Link href={href} className="underline whitespace-nowrap">
+      <Link href={href} className="underline wrap-anywhere">
         {children}
       </Link>
     );
@@ -286,7 +286,7 @@ function ChatMarkdownLink({ href, children }: { href?: string; children?: ReactN
 
   if (href?.startsWith("https://") || href?.startsWith("http://")) {
     return (
-      <a href={href} target="_blank" rel="noreferrer" className="underline">
+      <a href={href} target="_blank" rel="noreferrer" className="underline wrap-anywhere">
         {children}
       </a>
     );

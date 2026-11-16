@@ -1,6 +1,12 @@
 import { Prisma } from "@/generated/prisma/client";
 import { prisma } from "@/lib/prisma";
-import { Course, CourseSearchFilters, CourseSearchResult, SaveCourseData } from "@/models/course.model";
+import {
+  Course,
+  CourseSearchFilters,
+  CourseSearchResult,
+  SaveCourseData,
+  UpdateSaveCourseData,
+} from "@/models/course.model";
 import { ICourseRepository } from "./interfaces/course-repository.interface";
 import { courseInclude, toCourse } from "./mappers";
 
@@ -98,6 +104,24 @@ export class CourseRepository implements ICourseRepository {
         responsaveis: {
           create: data.responsavelIds.map((userId) => ({ userId })),
         },
+      },
+      include: courseInclude,
+    });
+    return toCourse(row);
+  }
+
+  async update(id: number, data: UpdateSaveCourseData): Promise<Course> {
+    const row = await prisma.curso.update({
+      where: { id },
+      data: {
+        nome: data.nome,
+        descricao: data.descricao,
+        cargaHoraria: data.cargaHoraria,
+        nivel: data.nivel,
+        provider: data.provider,
+        url: data.url,
+        imagemPath: data.imagemPath ?? null,
+        categoriaId: data.categoria_id ?? null,
       },
       include: courseInclude,
     });

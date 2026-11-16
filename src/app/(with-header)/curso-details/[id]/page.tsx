@@ -2,7 +2,7 @@
 
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ThumbsUp, Clock, CalendarDays, FileText, MessageCircle, Send, Star } from "lucide-react";
+import { ThumbsUp, Clock, CalendarDays, FileText, MessageCircle, Send, Pencil } from "lucide-react";
 import { useEffect, useState } from "react";
 import { CourseDetails } from "@/models/course.model";
 import { toast } from "sonner";
@@ -117,7 +117,7 @@ export default function CursoDetailsPage() {
     return <div className="text-zinc-600 dark:text-zinc-400">Curso não encontrado</div>;
   }
 
-  const canDeleteCourse =
+  const canManageCourse =
     session.data?.user?.role === "ADMIN" &&
     userId !== null &&
     (course.responsavelIds ?? []).includes(userId);
@@ -163,7 +163,17 @@ export default function CursoDetailsPage() {
           </Button>
         </div>
         <div className="flex items-center gap-4">
-          {canDeleteCourse && <DeleteCourseDialog courseId={course.id} courseName={course.nome} />}
+          {canManageCourse && (
+            <>
+              <Button variant="outline" asChild>
+                <Link href={`/editar-curso/${course.id}`}>
+                  <Pencil data-icon="inline-start" />
+                  Editar curso
+                </Link>
+              </Button>
+              <DeleteCourseDialog courseId={course.id} courseName={course.nome} />
+            </>
+          )}
           <Button className="bg-violet-500 hover:bg-violet-600 text-white font-semibold shadow-md">
             <Link href="/doacao">Realizar Doação</Link>
           </Button>

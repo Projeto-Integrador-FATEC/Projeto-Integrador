@@ -19,6 +19,7 @@ describe("CourseService", () => {
     findByCategoryId: vi.fn(),
     search: vi.fn(),
     create: vi.fn(),
+    update: vi.fn(),
     delete: vi.fn(),
   };
   const categoryRepository = {
@@ -42,6 +43,11 @@ describe("CourseService", () => {
       responsavelIds: data.responsavelIds,
     }));
     courseRepository.delete.mockResolvedValue(undefined);
+    courseRepository.update.mockImplementation(async (id, data) => ({
+      ...cursoTecnologia,
+      ...data,
+      id,
+    }));
     storageRepository.remove.mockResolvedValue(undefined);
     storageRepository.upload.mockResolvedValue(undefined);
   });
@@ -125,5 +131,35 @@ describe("CourseService", () => {
   it("retorna 404 ao excluir curso inexistente", async () => {
     courseRepository.findById.mockResolvedValue(null);
     await expect(service.delete(9999, admin.id)).rejects.toMatchObject({ status: 404, message: "Curso não encontrado" });
+  });
+
+  it("atualiza o curso quando o admin é responsável", async () => {
+    courseRepository.findById.mockResolvedValue(cursoTecnologia);
+    await service.update(cursoTecnologia.id, { ...baseData, nome: "Curso atualizado" }, admin.id);
+    expect(courseRepository.update).toHaveBeenCalledWith(
+      cursoTecnologia.id,
+      expect.objectContaining({ nome: "Curso atualizado", imagemPath: cursoTecnologia.imagemPath })
+    );
+  });
+
+  it("substitui a capa ao atualizar com nova imagem", async () => {
+    courseRepository.findById.mockResolvedValue({ ...cursoTecnologia, imagemPath: "antiga.png" });
+    const image = new File([new Uint8Array([1, 2, 3])], "nova.png", { type: "image/png" });
+    await service.update(cursoTecnologia.id, { ...baseData, image }, admin.id);
+    expect(storageRepository.upload).toHaveBeenCalledTimes(1);
+    expect(storageRepository.remove).toHaveBeenCalledWith("antiga.png");
+    expect(courseRepository.update).toHaveBeenCalledWith(
+      cursoTecnologia.id,
+      expect.objectContaining({ imagemPath: expect.stringMatching(/^\d+_nova\.png$/) })
+    );
+  });
+
+  it("impede a edição por admin que não é responsável", async () => {
+    courseRepository.findById.mockResolvedValue(cursoTecnologia);
+    await expect(service.update(cursoTecnologia.id, baseData, outroAdmin.id)).rejects.toMatchObject({
+      status: 403,
+      message: "Somente os administradores responsáveis pelo curso podem editá-lo",
+    });
+    expect(courseRepository.update).not.toHaveBeenCalled();
   });
 });

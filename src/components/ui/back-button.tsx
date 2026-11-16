@@ -64,7 +64,7 @@ export function BackButton({
   );
 
   const buttonClasses = cn(
-    "transition-colors",
+    "w-fit justify-start transition-colors",
     iconOnly ? "p-2" : "px-4 py-2",
     variant === "ghost" && "hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white",
     className
@@ -120,7 +120,7 @@ export function BackButtonServer({
   );
 
   const buttonClasses = cn(
-    "transition-colors",
+    "w-fit justify-start transition-colors",
     iconOnly ? "p-2" : "px-4 py-2",
     variant === "ghost" && "hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white",
     className

@@ -24,7 +24,7 @@ import { GET as getCategories } from "@/app/api/categorias/route";
 import { GET as getCoursesByCategory } from "@/app/api/categorias/categoria/[categoriaId]/route";
 import { GET as getComments } from "@/app/api/comentarios/curso/[cursoId]/route";
 import { POST as createComment } from "@/app/api/comentarios/route";
-import { GET as getCourse, DELETE as deleteCourse } from "@/app/api/cursos/[id]/route";
+import { GET as getCourse, PUT as updateCourse, DELETE as deleteCourse } from "@/app/api/cursos/[id]/route";
 import { GET as getCourses, POST as createCourse } from "@/app/api/cursos/route";
 import { GET as getUserByEmail } from "@/app/api/users/get-user-by-email/[email]/route";
 import { GET as getUser } from "@/app/api/users/get-user/[id]/route";
@@ -260,6 +260,46 @@ describe("Integração das rotas HTTP", () => {
     expect(after.status).toBe(404);
   });
 
+  it("permite editar o curso somente ao admin responsável", async () => {
+    const payload = {
+      nome: "Curso para edição",
+      descricao: "Descrição longa o bastante",
+      cargaHoraria: 10,
+      nivel: "iniciante",
+      provider: "Fatec",
+      url: "https://example.com/editar",
+      categoria_id: 1,
+    };
+    const created = await createCourse(courseRequest(payload, "Bearer admin"));
+    expect(created.status).toBe(200);
+    const course = await created.json();
+    const updated = { ...payload, nome: "Curso editado" };
+
+    const anonymous = await updateCourse(coursePutRequest(course.id, updated), {
+      params: Promise.resolve({ id: String(course.id) }),
+    });
+    expect(anonymous.status).toBe(401);
+
+    const student = await updateCourse(coursePutRequest(course.id, updated, "Bearer aluno"), {
+      params: Promise.resolve({ id: String(course.id) }),
+    });
+    expect(student.status).toBe(403);
+
+    const otherAdmin = await updateCourse(coursePutRequest(course.id, updated, "Bearer outro-admin"), {
+      params: Promise.resolve({ id: String(course.id) }),
+    });
+    expect(otherAdmin.status).toBe(403);
+    await expect(otherAdmin.json()).resolves.toEqual({
+      error: "Somente os administradores responsáveis pelo curso podem editá-lo",
+    });
+
+    const owner = await updateCourse(coursePutRequest(course.id, updated, "Bearer admin"), {
+      params: Promise.resolve({ id: String(course.id) }),
+    });
+    expect(owner.status).toBe(200);
+    await expect(owner.json()).resolves.toMatchObject({ id: course.id, nome: "Curso editado" });
+  });
+
   it("responde 400 para corpo inválido e 500 para falha inesperada", async () => {
     const errorSpy = vi.spyOn(console, "error").mockImplementation(() => undefined);
 
@@ -486,6 +526,16 @@ function courseRequest(curso: Record<string, unknown>, authorization?: string) {
   form.set("curso", JSON.stringify(curso));
   return new Request("http://localhost/api/cursos", {
     method: "POST",
+    headers: authorization ? { authorization } : undefined,
+    body: form,
+  });
+}
+
+function coursePutRequest(id: number, curso: Record<string, unknown>, authorization?: string) {
+  const form = new FormData();
+  form.set("curso", JSON.stringify(curso));
+  return new Request("http://localhost/api/cursos/" + id, {
+    method: "PUT",
     headers: authorization ? { authorization } : undefined,
     body: form,
   });

@@ -152,6 +152,28 @@ export function createTestApp(): TestApp {
       courses.push(course);
       return course;
     },
+    update: async (id, data) => {
+      const course = courses.find((item) => item.id === id);
+
+      if (!course) {
+        throw new HttpError("Curso não encontrado", 404);
+      }
+
+      const category = data.categoria_id
+        ? categories.find((item) => item.id === data.categoria_id) ?? null
+        : null;
+
+      course.nome = data.nome;
+      course.descricao = data.descricao;
+      course.cargaHoraria = data.cargaHoraria;
+      course.nivel = data.nivel;
+      course.provider = data.provider;
+      course.url = data.url;
+      course.imagemPath = data.imagemPath ?? null;
+      course.categoria = category;
+      course.categoria_id = category?.id ?? null;
+      return { ...course };
+    },
     delete: async (id) => {
       const index = courses.findIndex((course) => course.id === id);
       if (index >= 0) {

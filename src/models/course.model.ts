@@ -34,10 +34,14 @@ export interface CreateCourseData {
   image?: File | null;
 }
 
+export type UpdateCourseData = CreateCourseData;
+
 export interface SaveCourseData extends Omit<CreateCourseData, "image"> {
   imagemPath?: string | null;
   responsavelIds: number[];
 }
+
+export type UpdateSaveCourseData = Omit<SaveCourseData, "responsavelIds">;
 
 export interface CourseImage {
   body: ArrayBuffer;

@@ -1,5 +1,12 @@
 import { HttpError } from "@/lib/http-error";
-import { Course, CourseImage, CourseSearchQuery, CourseSearchResult, CreateCourseData } from "@/models/course.model";
+import {
+  Course,
+  CourseImage,
+  CourseSearchQuery,
+  CourseSearchResult,
+  CreateCourseData,
+  UpdateCourseData,
+} from "@/models/course.model";
 import { ICategoryRepository } from "@/repositories/interfaces/category-repository.interface";
 import { ICourseRepository } from "@/repositories/interfaces/course-repository.interface";
 import { IStorageRepository } from "@/repositories/interfaces/storage-repository.interface";
@@ -72,16 +79,7 @@ export class CourseService implements ICourseService {
       throw new HttpError("Categoria não encontrada", 400);
     }
 
-    let imagemPath: string | null = null;
-
-    if (image && image.size > 0) {
-      if (image.size > MAX_IMAGE_SIZE) {
-        throw new HttpError("A imagem deve ter no máximo 10MB", 400);
-      }
-
-      imagemPath = `${Date.now()}_${this.sanitizeFileName(image.name)}`;
-      await this.storageRepository.upload(imagemPath, image);
-    }
+    const imagemPath = await this.uploadImageIfPresent(image);
 
     return this.courseRepository.create({
       ...courseData,
@@ -91,16 +89,38 @@ export class CourseService implements ICourseService {
     });
   }
 
+  async update(id: number, data: UpdateCourseData, userId: number): Promise<Course> {
+    const course = await this.requireResponsible(id, userId, "editar");
+    const { image, ...courseData } = data;
+    const categoryId = courseData.categoria_id ? courseData.categoria_id : null;
+
+    if (categoryId !== null && !(await this.categoryRepository.findById(categoryId))) {
+      throw new HttpError("Categoria não encontrada", 400);
+    }
+
+    let imagemPath = course.imagemPath;
+
+    if (image && image.size > 0) {
+      imagemPath = await this.uploadImageIfPresent(image);
+
+      if (course.imagemPath) {
+        try {
+          await this.storageRepository.remove(course.imagemPath);
+        } catch {
+          // A capa antiga pode já ter sido removida do storage.
+        }
+      }
+    }
+
+    return this.courseRepository.update(id, {
+      ...courseData,
+      categoria_id: categoryId,
+      imagemPath,
+    });
+  }
+
   async delete(id: number, userId: number): Promise<void> {
-    const course = await this.courseRepository.findById(id);
-
-    if (!course) {
-      throw new HttpError("Curso não encontrado", 404);
-    }
-
-    if (!course.responsavelIds.includes(userId)) {
-      throw new HttpError("Somente os administradores responsáveis pelo curso podem excluí-lo", 403);
-    }
+    const course = await this.requireResponsible(id, userId, "excluir");
 
     if (course.imagemPath) {
       try {
@@ -121,6 +141,39 @@ export class CourseService implements ICourseService {
     }
 
     return image;
+  }
+
+  private async requireResponsible(id: number, userId: number, acao: "editar" | "excluir"): Promise<Course> {
+    const course = await this.courseRepository.findById(id);
+
+    if (!course) {
+      throw new HttpError("Curso não encontrado", 404);
+    }
+
+    if (!course.responsavelIds.includes(userId)) {
+      throw new HttpError(
+        acao === "editar"
+          ? "Somente os administradores responsáveis pelo curso podem editá-lo"
+          : "Somente os administradores responsáveis pelo curso podem excluí-lo",
+        403
+      );
+    }
+
+    return course;
+  }
+
+  private async uploadImageIfPresent(image?: File | null): Promise<string | null> {
+    if (!image || image.size === 0) {
+      return null;
+    }
+
+    if (image.size > MAX_IMAGE_SIZE) {
+      throw new HttpError("A imagem deve ter no máximo 10MB", 400);
+    }
+
+    const imagemPath = `${Date.now()}_${this.sanitizeFileName(image.name)}`;
+    await this.storageRepository.upload(imagemPath, image);
+    return imagemPath;
   }
 
   private async resolveCategoryId(nome: string): Promise<number> {

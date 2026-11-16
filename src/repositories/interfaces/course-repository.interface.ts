@@ -1,4 +1,10 @@
-import { Course, CourseSearchFilters, CourseSearchResult, SaveCourseData } from "@/models/course.model";
+import {
+  Course,
+  CourseSearchFilters,
+  CourseSearchResult,
+  SaveCourseData,
+  UpdateSaveCourseData,
+} from "@/models/course.model";
 
 export interface ICourseRepository {
   findAll(): Promise<Course[]>;
@@ -6,5 +12,6 @@ export interface ICourseRepository {
   findByCategoryId(categoryId: number): Promise<Course[]>;
   search(filters: CourseSearchFilters): Promise<CourseSearchResult>;
   create(data: SaveCourseData): Promise<Course>;
+  update(id: number, data: UpdateSaveCourseData): Promise<Course>;
   delete(id: number): Promise<void>;
 }

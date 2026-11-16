@@ -10,6 +10,7 @@ describe("CategoryService", () => {
     findByCategoryId: vi.fn(),
     search: vi.fn(),
     create: vi.fn(),
+    update: vi.fn(),
     delete: vi.fn(),
   };
   const service = new CategoryService(categoryRepository, courseRepository);

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { validateReviewAdminRequest } from "@/app/DTOs/admin-request.dto";
-import { requireRole } from "@/lib/auth-guard";
+import { requireSeedAdmin } from "@/lib/auth-guard";
 import { HttpError, toErrorResponse } from "@/lib/http-error";
 import { modules } from "@/services/modules";
 
@@ -9,7 +9,7 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const reviewer = await requireRole(request, "ADMIN");
+    const reviewer = await requireSeedAdmin(request);
     const { id } = await params;
     const requestId = Number(id);
 

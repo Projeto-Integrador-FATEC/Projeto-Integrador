@@ -15,7 +15,13 @@ const ERROR_MESSAGES: Record<string, string> = {
 
 const EMAIL_VERIFIED_CALLBACK_URL = "/email-verificado";
 
-type AuthUser = { id: string | number; name: string; email: string; role?: string | null };
+type AuthUser = {
+  id: string | number;
+  name: string;
+  email: string;
+  role?: string | null;
+  seedAdmin?: boolean | null;
+};
 
 function toUser(user: AuthUser): User {
   return {
@@ -23,6 +29,7 @@ function toUser(user: AuthUser): User {
     name: user.name,
     email: user.email,
     role: user.role ?? "ALUNO",
+    seedAdmin: Boolean(user.seedAdmin),
   };
 }
 

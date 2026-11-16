@@ -74,6 +74,7 @@ describe("UserService", () => {
   it("encerra a sessão e lê o usuário autenticado", async () => {
     const headers = new Headers();
     authRepository.getSessionUser.mockResolvedValue(aluno);
+    userRepository.findById.mockResolvedValue(aluno);
     await service.logout(headers);
     await expect(service.getSessionUser(headers)).resolves.toEqual(aluno);
     expect(authRepository.signOut).toHaveBeenCalledWith(headers);

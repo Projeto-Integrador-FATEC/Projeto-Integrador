@@ -9,7 +9,7 @@ import { modules } from "@/services/modules";
 
 export async function Header() {
   const user = await modules.services.user.getSessionUser(await headers());
-  const isAdmin = user?.role === "ADMIN";
+  const canReviewAdminRequests = Boolean(user?.seedAdmin);
 
   return (
     <header className="w-full bg-violet-500 dark:bg-violet-600 shadow-md py-4 px-8 flex items-center justify-center gap-4">
@@ -19,7 +19,7 @@ export async function Header() {
           <h1 className="text-white text-2xl font-bold">Study Lovers</h1>
         </Link>
         <div className="ml-auto flex items-center gap-4">
-          {isAdmin && (
+          {canReviewAdminRequests && (
             <Button asChild variant="ghost" className="text-white hover:bg-violet-600 hover:text-white">
               <Link href="/solicitacoes-admin">Chamados</Link>
             </Button>

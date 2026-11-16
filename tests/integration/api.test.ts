@@ -503,6 +503,16 @@ describe("Integração das rotas HTTP", () => {
     expect(queue.status).toBe(200);
     await expect(queue.json()).resolves.toEqual([expect.objectContaining({ id: request.id })]);
 
+    const promotedAdmin = await reviewAdminRequest(
+      jsonRequest(
+        "http://localhost/api/solicitacoes-admin/1",
+        { status: "APROVADA" },
+        { method: "PATCH", headers: { authorization: "Bearer outro-admin" } }
+      ),
+      { params: Promise.resolve({ id: String(request.id) }) }
+    );
+    expect(promotedAdmin.status).toBe(403);
+
     const approved = await reviewAdminRequest(
       jsonRequest(
         "http://localhost/api/solicitacoes-admin/1",

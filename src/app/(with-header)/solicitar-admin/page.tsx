@@ -11,8 +11,12 @@ export default function SolicitarAdminPage() {
   const { data: session, isPending } = useSession();
 
   useEffect(() => {
-    if (!isPending && session?.user?.role === "ADMIN") {
-      router.replace("/solicitacoes-admin");
+    if (isPending) {
+      return;
+    }
+
+    if (session?.user?.role === "ADMIN") {
+      router.replace("/");
     }
   }, [isPending, session, router]);
 

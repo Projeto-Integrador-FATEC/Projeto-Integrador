@@ -20,3 +20,13 @@ export async function requireRole(request: Request, role: string) {
 
   return user;
 }
+
+export async function requireSeedAdmin(request: Request) {
+  const user = await requireRole(request, "ADMIN");
+
+  if (!user.seedAdmin) {
+    throw new HttpError("Apenas os administradores iniciais podem analisar chamados", 403);
+  }
+
+  return user;
+}

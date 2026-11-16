@@ -1,27 +1,14 @@
-"use client";
-
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { useSession } from "@/lib/auth-client";
+import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 import { BackButton } from "@/components/ui/back-button";
 import { AdminRequestQueue } from "@/components/admin-request/admin-request-queue";
+import { modules } from "@/services/modules";
 
-export default function SolicitacoesAdminPage() {
-  const router = useRouter();
-  const { data: session, isPending } = useSession();
+export default async function SolicitacoesAdminPage() {
+  const user = await modules.services.user.getSessionUser(await headers());
 
-  useEffect(() => {
-    if (!isPending && session?.user?.role !== "ADMIN") {
-      router.replace("/");
-    }
-  }, [isPending, session, router]);
-
-  if (isPending) {
-    return <p className="p-8">Carregando...</p>;
-  }
-
-  if (session?.user?.role !== "ADMIN") {
-    return null;
+  if (!user?.seedAdmin) {
+    redirect("/");
   }
 
   return (

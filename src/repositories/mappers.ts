@@ -32,6 +32,7 @@ export function toUser(row: PrismaUser): User {
     name: row.name,
     email: row.email,
     role: row.role,
+    seedAdmin: row.seedAdmin,
   };
 }
 

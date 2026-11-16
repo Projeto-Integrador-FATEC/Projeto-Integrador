@@ -45,6 +45,7 @@ describe("AdminRequestService", () => {
   });
 
   it("aprova o chamado e promove o usuário", async () => {
+    userRepository.findById.mockResolvedValue(admin);
     adminRequestRepository.findById.mockResolvedValue(pending);
     adminRequestRepository.review.mockResolvedValue({ ...pending, status: "APROVADA", reviewedById: admin.id });
     userRepository.updateRole.mockResolvedValue({ ...aluno, role: "ADMIN" });
@@ -53,5 +54,15 @@ describe("AdminRequestService", () => {
       status: "APROVADA",
     });
     expect(userRepository.updateRole).toHaveBeenCalledWith(aluno.id, "ADMIN");
+  });
+
+  it("impede administrador promovido de analisar chamados", async () => {
+    userRepository.findById.mockResolvedValue({ ...aluno, role: "ADMIN", seedAdmin: false });
+    adminRequestRepository.findById.mockResolvedValue(pending);
+
+    await expect(service.review(pending.id, aluno.id, { status: "APROVADA" })).rejects.toMatchObject({
+      status: 403,
+    });
+    expect(adminRequestRepository.review).not.toHaveBeenCalled();
   });
 });

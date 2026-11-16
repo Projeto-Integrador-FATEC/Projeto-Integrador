@@ -271,6 +271,7 @@ export function createTestApp(): TestApp {
         name: data.name,
         email: data.email,
         role: "ALUNO",
+        seedAdmin: false,
       };
       users.push(user);
       passwords.set(user.email, data.password);

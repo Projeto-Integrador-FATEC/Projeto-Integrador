@@ -18,13 +18,13 @@ const bucket = process.env.SUPABASE_STORAGE_BUCKET ?? "cursos";
 const imagesDir = path.join(process.cwd(), "prisma", "seed", "imagens");
 
 const users = [
-  { name: "Daniel", email: "daniel@gmail.com", password: "Daniel@Admin27!", role: "ADMIN" },
-  { name: "Ruan", email: "ruan@gmail.com", password: "Ruan@Admin58!", role: "ADMIN" },
-  { name: "Dornelas", email: "dornelas@gmail.com", password: "Dornelas@Admin41!", role: "ADMIN" },
-  { name: "Gustavo", email: "gustavo@gmail.com", password: "Gustavo@Admin73!", role: "ADMIN" },
-  { name: "Alexandre", email: "alexandre@gmail.com", password: "Alexandre@Admin36!", role: "ADMIN" },
-  { name: "Felipe", email: "felipe@gmail.com", password: "Felipe@Admin92!", role: "ADMIN" },
-  { name: "AlunoTeste", email: "aluno@gmail.com", password: "Aluno@aluno2!", role: "ALUNO" },
+  { name: "Daniel", email: "daniel@gmail.com", password: "Daniel@Admin27!", role: "ADMIN", seedAdmin: true },
+  { name: "Ruan", email: "ruan@gmail.com", password: "Ruan@Admin58!", role: "ADMIN", seedAdmin: true },
+  { name: "Dornelas", email: "dornelas@gmail.com", password: "Dornelas@Admin41!", role: "ADMIN", seedAdmin: true },
+  { name: "Gustavo", email: "gustavo@gmail.com", password: "Gustavo@Admin73!", role: "ADMIN", seedAdmin: true },
+  { name: "Alexandre", email: "alexandre@gmail.com", password: "Alexandre@Admin36!", role: "ADMIN", seedAdmin: true },
+  { name: "Felipe", email: "felipe@gmail.com", password: "Felipe@Admin92!", role: "ADMIN", seedAdmin: true },
+  { name: "AlunoTeste", email: "aluno@gmail.com", password: "Aluno@aluno2!", role: "ALUNO", seedAdmin: false },
 ];
 
 const categories = [
@@ -119,7 +119,7 @@ async function main() {
   for (const { password, ...user } of users) {
     const saved = await prisma.user.upsert({
       where: { email: user.email },
-      update: {},
+      update: { role: user.role, seedAdmin: user.seedAdmin },
       create: user,
     });
 

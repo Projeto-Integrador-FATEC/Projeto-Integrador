@@ -46,6 +46,12 @@ export class AdminRequestService implements IAdminRequestService {
   }
 
   async review(id: number, reviewerId: number, data: ReviewAdminRequestData): Promise<AdminRequest> {
+    const reviewer = await this.userRepository.findById(reviewerId);
+
+    if (!reviewer?.seedAdmin) {
+      throw new HttpError("Apenas os administradores iniciais podem analisar chamados", 403);
+    }
+
     const request = await this.adminRequestRepository.findById(id);
 
     if (!request) {

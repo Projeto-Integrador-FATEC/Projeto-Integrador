@@ -1,12 +1,12 @@
 import { NextResponse } from "next/server";
 import { validateCreateAdminRequest } from "@/app/DTOs/admin-request.dto";
-import { requireRole, requireUser } from "@/lib/auth-guard";
+import { requireSeedAdmin, requireUser } from "@/lib/auth-guard";
 import { HttpError, toErrorResponse } from "@/lib/http-error";
 import { modules } from "@/services/modules";
 
 export async function GET(request: Request) {
   try {
-    await requireRole(request, "ADMIN");
+    await requireSeedAdmin(request);
     const requests = await modules.services.adminRequest.listAll();
     return NextResponse.json(requests);
   } catch (error) {

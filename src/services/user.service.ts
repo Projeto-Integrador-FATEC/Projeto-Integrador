@@ -55,6 +55,12 @@ export class UserService implements IUserService {
   }
 
   async getSessionUser(headers: Headers): Promise<User | null> {
-    return this.authRepository.getSessionUser(headers);
+    const sessionUser = await this.authRepository.getSessionUser(headers);
+
+    if (!sessionUser) {
+      return null;
+    }
+
+    return (await this.userRepository.findById(sessionUser.id)) ?? sessionUser;
   }
 }

@@ -27,7 +27,7 @@ describe("AuthRepository", () => {
     api.signUpEmail.mockResolvedValue({ user: authUser });
     await expect(
       repository.signUp({ name: "Nova", email: authUser.email, password: "senha1234" })
-    ).resolves.toEqual({ id: 7, name: "Nova", email: authUser.email, role: "ALUNO" });
+    ).resolves.toEqual({ id: 7, name: "Nova", email: authUser.email, role: "ALUNO", seedAdmin: false });
     expect(api.signUpEmail).toHaveBeenCalledWith({
       body: {
         name: "Nova",
@@ -73,6 +73,7 @@ describe("AuthRepository", () => {
       name: "Nova",
       email: authUser.email,
       role: "ALUNO",
+      seedAdmin: false,
       token: "sessao",
     });
 

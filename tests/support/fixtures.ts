@@ -10,6 +10,7 @@ export const aluno: User = {
   name: "Estudante Fatec",
   email: "estudante@fatec.sp.gov.br",
   role: "ALUNO",
+  seedAdmin: false,
 };
 
 export const admin: User = {
@@ -17,6 +18,7 @@ export const admin: User = {
   name: "Admin",
   email: "admin@fatec.sp.gov.br",
   role: "ADMIN",
+  seedAdmin: true,
 };
 
 export const outroAdmin: User = {
@@ -24,6 +26,7 @@ export const outroAdmin: User = {
   name: "Outro Admin",
   email: "outro.admin@fatec.sp.gov.br",
   role: "ADMIN",
+  seedAdmin: false,
 };
 
 export function makeCourse(overrides: Partial<Course> = {}): Course {

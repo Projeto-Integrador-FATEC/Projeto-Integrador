@@ -301,8 +301,8 @@ A implantação depende da configuração dos secrets necessários no GitHub e d
 |---|---|---|
 | Alexandre Munhoz de Oliveira  | Dev Team | - |
 | Daniel Vigano da Silva | Scrum Master | [@DanielV17](https://github.com/DanielV17) |
-| Felipe Domingues Nunes | Dev Team | [@GustaHxH](https://github.com/GustaHxH) |
-| Gustavo Santos Rocha | Dev Team | - |
+| Felipe Domingues Nunes | Dev Team | - |
+| Gustavo Santos Rocha | Dev Team | [@GustaHxH](https://github.com/GustaHxH)  |
 | Ruan Silva Meira | Dev Team | - |
 | Vinícius Silva Dornelas | Dev Team | - |
 

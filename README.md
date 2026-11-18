@@ -304,7 +304,7 @@ A implantação depende da configuração dos secrets necessários no GitHub e d
 | Felipe Domingues Nunes | Dev Team | - |
 | Gustavo Santos Rocha | Dev Team | [@GustaHxH](https://github.com/GustaHxH)  |
 | Ruan Silva Meira | Dev Team | - |
-| Vinícius Silva Dornelas | Dev Team | - |
+| Vinícius Silva Dornelas | Dev Team | - |https://github.com/ViniSDornelas
 
 ## 📬 Contato
 
